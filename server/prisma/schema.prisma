@@ -1,0 +1,104 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  UserID    Int      @id @default(autoincrement())
+  Username  String   @unique
+  Name      String
+  Email     String   @unique
+  Password  String
+  CreatedAt DateTime @default(now()) @map("Created_at")
+
+  CreatedGroups    Group[]            @relation("GroupCreator")
+  Groups           GroupMembers[]
+  Debts            Debt[]
+  ItemParticipants ItemParticipants[]
+}
+
+model Group {
+  GroupID       Int      @id @default(autoincrement())
+  Name          String
+  Description   String?
+  CreatedByUser String   @map("Created_by_user")
+  CreatedAt     DateTime @default(now()) @map("Created_at")
+
+  Bills   Bill[]
+  Members GroupMembers[]
+
+  Creator User @relation("GroupCreator", fields: [CreatedByUser], references: [Username])
+}
+
+// Ini adalah tabel join untuk relasi many-to-many User dan Group
+model GroupMembers {
+  User    User  @relation(fields: [UserID], references: [UserID])
+  UserID  Int
+  Group   Group @relation(fields: [GroupID], references: [GroupID])
+  GroupID Int
+
+  @@id([UserID, GroupID])
+}
+
+model Bill {
+  BillID          Int      @id @default(autoincrement())
+  Title           String
+  BillDate        DateTime @default(now()) @map("Bill_date")
+  TotalAmount     Int      @map("Total_amount")
+  TaxAndService   Int?     @map("Tax_and_service")
+  Discount        Int?
+  ReceiptImageURL String?  @map("Receipts_image_url")
+
+  Group   Group @relation(fields: [GroupID], references: [GroupID])
+  GroupID Int
+
+  Items Item[]
+  Debts Debt[]
+}
+
+model Item {
+  ItemID String @id @default(uuid())
+  Name   String
+  Price  Int
+
+  Bill   Bill @relation(fields: [BillID], references: [BillID])
+  BillID Int
+
+  Participants ItemParticipants[]
+}
+
+// Tabel join untuk relasi many-to-many Item dan User
+model ItemParticipants {
+  Item   Item   @relation(fields: [ItemID], references: [ItemID])
+  ItemID String
+  User   User   @relation(fields: [UserID], references: [UserID])
+  UserID Int
+
+  @@id([ItemID, UserID])
+}
+
+model Debt {
+  DebtID     Int        @id @default(autoincrement())
+  AmountOwed Int        @map("Amount Owed")
+  Status     DebtStatus
+
+  Bill   Bill @relation(fields: [BillID], references: [BillID])
+  BillID Int
+  User   User @relation(fields: [UserID], references: [UserID])
+  UserID Int
+}
+
+enum DebtStatus {
+  paid
+  unpaid
+}
