@@ -24,7 +24,7 @@ export class AuthService {
         throw new ConflictException(`Username ${req.username} already exists!`);
       }
 
-      const existingEmail = await this.userRepository.findByEmail(req.username)
+      const existingEmail = await this.userRepository.findByEmail(req.email)
       if (existingEmail) {
         throw new ConflictException(`Email ${req.email} already exists!`);
       }
