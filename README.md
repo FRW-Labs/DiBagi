@@ -38,9 +38,6 @@ cd server
 # Install dependency
 npm install
 
-# Buat file .env dan sesuaikan dengan konfigurasi databasemu
-# (lihat .env.example)
-
 # Jalankan server backend
 npm run start:dev
 ```
@@ -49,7 +46,7 @@ npm run start:dev
 
 ```sh
 # Masuk ke folder frontend
-cd ../frontend # (sesuaikan nama folder frontend)
+cd client
 
 # Install dependency
 flutter pub get
