@@ -67,7 +67,7 @@ model Bill {
 }
 
 model Item {
-  ItemID Int    @id @default(autoincrement())
+  ItemID String @id @default(uuid())
   Name   String
   Price  Int
 
@@ -79,9 +79,9 @@ model Item {
 
 // Tabel join untuk relasi many-to-many Item dan User
 model ItemParticipants {
-  Item   Item @relation(fields: [ItemID], references: [ItemID])
-  ItemID Int
-  User   User @relation(fields: [UserID], references: [UserID])
+  Item   Item   @relation(fields: [ItemID], references: [ItemID])
+  ItemID String
+  User   User   @relation(fields: [UserID], references: [UserID])
   UserID Int
 
   @@id([ItemID, UserID])

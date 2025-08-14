@@ -22,7 +22,7 @@ import { JwtStrategy } from './infrastructure/guards/jwt.strategy';
   imports: [
     PassportModule,
     JwtModule.register({
-      secret: 'JKOb7uA7H7DTP14',
+      secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '1h' },
     }),
   ],
