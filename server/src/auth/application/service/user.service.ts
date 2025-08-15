@@ -6,12 +6,25 @@ import {
 } from '@nestjs/common';
 import { IUserRepository} from '../../domain/repository/i-user.repository';
 import { UserResponse } from '../dto/user.dto';
+import { SearchUserDto } from '../dto/search-user.dto';
 
 @Injectable()
 export class UserService {
   constructor(
     @Inject(IUserRepository) private readonly userRepository: IUserRepository,
   ) {}
+
+  async search(searchDto: SearchUserDto): Promise<UserResponse> {
+    const {username, email} = searchDto;
+    if (username) {
+      return this.findByUsername(username);
+    }
+    if (email) {
+      return this.findByEmail(email);
+    }
+
+    throw new BadRequestException("Username and email must be provided");
+  }
 
   async findById(userId: number): Promise<UserResponse> {
     // 1. Check if userID is valid
