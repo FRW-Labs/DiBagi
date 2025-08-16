@@ -1,7 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { AuthModule } from './auth/auth.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { LoggerMiddleware } from './auth/application/middleware/logger.middleware';
+import { LoggerMiddleware } from './common/logger.middleware';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -11,7 +11,7 @@ import { LoggerMiddleware } from './auth/application/middleware/logger.middlewar
         limit: 10, // Batas 10 request per 60 detik dari satu IP
       },
     ]),
-    AuthModule,
+    UserModule,
   ],
   controllers: [],
   providers: [

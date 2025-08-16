@@ -5,22 +5,49 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import {
+  Body,
   Controller,
   Get,
   Param,
   ParseIntPipe,
+  Post,
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { UserService } from '../service/user.service';
-import { UserResponse } from '../dto/user.dto';
-import { SearchUserDto } from '../dto/search-user.dto';
-import { JwtAuthGuard } from 'src/auth/infrastructure/guards/jwt-auth.guards';
+import { UserService } from './user.service';
+import { LoginResponse, UserResponse } from '../model/response/user.response';
+import { SearchUserDto } from '../model/request/user.request';
+import { JwtAuthGuard } from '../common/jwt.service';
+import { LoginRequest, RegisterRequest } from '../model/request/auth.request';
 
 @ApiTags('User')
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Post('register')
+  @ApiOperation({ summary: 'Register a user' })
+  @ApiResponse({
+    status: 201,
+    description: 'User Registered Successfully',
+    type: UserResponse,
+  })
+  @ApiResponse({ status: 409, description: 'User Already Exists' })
+  async register(@Body() registerDto: RegisterRequest): Promise<UserResponse> {
+    return this.userService.register(registerDto);
+  }
+
+  @Post('login')
+  @ApiOperation({ summary: 'Login a user' })
+  @ApiResponse({
+    status: 201,
+    description: 'User Login Successfully',
+    type: LoginResponse,
+  })
+  @ApiResponse({ status: 401, description: 'Incorrect authentication' })
+  async login(@Body() loginDto: LoginRequest): Promise<LoginResponse> {
+    return this.userService.login(loginDto);
+  }
 
   // users/3
   @UseGuards(JwtAuthGuard)
