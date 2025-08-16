@@ -4,7 +4,7 @@ import { User } from '../entity/user.entity';
 
 @Injectable()
 export class UserRepository {
-  // 1. inisialisasi Prisma ORM
+  // 1. inisialisasi prisma service
   constructor(private readonly prisma: PrismaService) {}
 
   async save(user: User): Promise<User> {

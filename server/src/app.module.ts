@@ -2,6 +2,7 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { LoggerMiddleware } from './common/logger.middleware';
 import { UserModule } from './user/user.module';
+import { GroupModule } from './group/group.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { UserModule } from './user/user.module';
       },
     ]),
     UserModule,
+    GroupModule,
   ],
   controllers: [],
   providers: [

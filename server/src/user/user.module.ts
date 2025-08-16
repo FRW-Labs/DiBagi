@@ -20,10 +20,7 @@ import { JwtStrategy } from '../common/jwt.service';
   ],
   providers: [
     UserService,
-    {
-      provide: UserRepository,
-      useClass: UserRepository,
-    },
+    UserRepository,
     PrismaService,
     JwtStrategy,
   ],

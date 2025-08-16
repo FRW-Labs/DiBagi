@@ -20,15 +20,16 @@ export class UserService {
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
   ) {}
+
   async register(req: RegisterRequest): Promise<UserResponse> {
     // 1. start transaction
     const createdUserEntity = await this.prisma.$transaction(async (tx) => {
+
       // 2. check for duplicate key value
       const existingUsername = await this.userRepository.findByUsername(req.username)
       if (existingUsername) {
         throw new ConflictException(`Username ${req.username} already exists!`);
       }
-
       const existingEmail = await this.userRepository.findByEmail(req.email)
       if (existingEmail) {
         throw new ConflictException(`Email ${req.email} already exists!`);

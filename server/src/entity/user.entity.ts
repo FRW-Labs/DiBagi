@@ -1,3 +1,5 @@
+import { UserResponse } from '../model/response/user.response';
+
 export class User {
   public readonly UserID: number;
   public readonly Username: string;

@@ -22,7 +22,7 @@ async function bootstrap() {
 
   // Configure Swagger
   const config = new DocumentBuilder()
-    .setTitle('Dibagi Split Bill API')
+    .setTitle('DiBagi Split Bill API')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api-docs', app, document);
