@@ -1,11 +1,30 @@
-import { Module } from '@nestjs/common';
-import { AuthModule } from './auth/auth.module';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { LoggerMiddleware } from './common/logger.middleware';
+import { UserModule } from './user/user.module';
+import { GroupModule } from './group/group.module';
 
 @Module({
   imports: [
-    AuthModule,
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000, // Waktu dalam milidetik (60 detik)
+        limit: 10, // Batas 10 request per 60 detik dari satu IP
+      },
+    ]),
+    UserModule,
+    GroupModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: 'APP_GUARD',
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*'); // Terapkan ke semua route
+  }
+}
