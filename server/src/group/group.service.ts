@@ -141,7 +141,7 @@ export class GroupService {
 
   async deleteGroup(groupId: number, authUser: UserResponse): Promise<string> {
     const updatedGroup = await this.prisma.$transaction(async (tx) => {
-      const targetGroup = await this.getGroupById(groupId);
+      const targetGroup = await this.groupRepository.getGroupById(groupId, tx);
       if (!targetGroup) {
         throw new NotFoundException(`Group dengan ID ${groupId} tidak ditemukan.`);
       }
