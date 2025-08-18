@@ -92,7 +92,7 @@ export class GroupService {
     const updatedGroup = await this.prisma.$transaction(async (tx) => {
 
       // 2. authorization layer
-      const groupToUpdate = await this.getGroupById(groupId);
+      const groupToUpdate = await this.groupRepository.getGroupById(groupId, tx);
       if (!groupToUpdate) {
         throw new NotFoundException(`Group dengan ID ${groupId} tidak ditemukan.`);
       }
