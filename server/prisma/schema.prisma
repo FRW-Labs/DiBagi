@@ -14,12 +14,13 @@ datasource db {
 }
 
 model User {
-  UserID    Int      @id @default(autoincrement())
-  Username  String   @unique
-  Name      String
-  Email     String   @unique
-  Password  String
-  CreatedAt DateTime @default(now()) @map("Created_at")
+  UserID             Int      @id @default(autoincrement())
+  Username           String   @unique
+  Name               String
+  Email              String   @unique
+  Password           String
+  CreatedAt          DateTime @default(now()) @map("Created_at")
+  hashedRefreshToken String?  @map("hashed_refresh_token")
 
   CreatedGroups    Group[]            @relation("GroupCreator")
   Groups           GroupMembers[]
