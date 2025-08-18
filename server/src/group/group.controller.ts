@@ -2,10 +2,12 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
   Post,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { GroupService } from './group.service';
@@ -67,6 +69,45 @@ export class GroupController {
 
     return {
       data: groups,
+    }
+  }
+
+  @Put(':groupId/update')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Update group with Id ${groupId}' })
+  @ApiResponse({ status: 200, description: 'Update group with Id ${groupId}', type: WebResponse<GroupResponse> })
+  @ApiResponse({ status: 404, description: 'Group not found' })
+  async update(@Param('groupId', ParseIntPipe) groupId: number, @Body() createGroupRequest: CreateGroupRequest, @Auth() user: UserResponse): Promise<WebResponse<GroupResponse>> {
+    const updatedGroup = await this.groupService.update(groupId, createGroupRequest, user)
+
+    return {
+      data: updatedGroup,
+    }
+  }
+
+  @Put(':groupId/remove-member/:userId')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Remove member from the group' })
+  @ApiResponse({ status: 200, description: 'Remove member from group', type: WebResponse<string> })
+  @ApiResponse({ status: 404, description: 'Group or User not found' })
+  async removeMember(@Param('groupId', ParseIntPipe) groupId: number, @Param('userId', ParseIntPipe) userId: number, @Auth() user: UserResponse): Promise<WebResponse<string>> {
+    const updatedGroup = await this.groupService.removeMember(groupId, userId, user)
+
+    return {
+      data: updatedGroup,
+    }
+  }
+
+  @Delete(':groupId/delete')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Delete group with Id ${groupId}' })
+  @ApiResponse({ status: 200, description: 'Delete Group', type: WebResponse<string> })
+  @ApiResponse({ status: 404, description: 'Group not found' })
+  async deleteGroup(@Param('groupId', ParseIntPipe) groupId: number, @Auth() user: UserResponse): Promise<WebResponse<string>> {
+    const deletedGroup = await this.groupService.deleteGroup(groupId, user)
+
+    return {
+      data: deletedGroup,
     }
   }
 }

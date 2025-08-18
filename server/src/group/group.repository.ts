@@ -108,14 +108,75 @@ export class GroupRepository {
         Description: group.Description,
         CreatedBy: group.CreatedByUser,
         CreatedAt: group.CreatedAt,
+        userIds: memberIds
       })
     })
   }
 
-  // TODO: update group info (name & description)
-  async update(group: Group, groupId: number, tx?: Prisma.TransactionClient): Promise<void> {
+  async update(group: Group, tx?: Prisma.TransactionClient): Promise<Group> {
+    const prismaClient = tx || this.prisma;
+    // 1. define the changed data
+    const dataToChange = {
+      Name: group.Name,
+      Description: group.Description,
+    }
 
+    // 2. update the group
+    const editedGroup = await prismaClient.group.update({
+      where: { GroupID: group.GroupId },
+      data: dataToChange,
+      include: {
+        Members: true
+      }
+    })
+
+    const memberIds = editedGroup.Members.map(member => member.UserID)
+    return Group.from({
+      GroupId: editedGroup.GroupID,
+      Name: editedGroup.Name,
+      Description: editedGroup.Description,
+      CreatedBy: editedGroup.CreatedByUser,
+      CreatedAt: editedGroup.CreatedAt,
+      userIds: memberIds
+    })
   }
-  // TODO: remove group member
-  // TODO: delete group
+
+  async removeMember(groupId: number, userId: number, tx?: Prisma.TransactionClient): Promise<void> {
+    const prismaClient = tx || this.prisma;
+
+    // 1. check if group exists
+    const targetGroup = await prismaClient.group.findUnique({
+      where: { GroupID: groupId }
+    })
+    if (!targetGroup) {
+      return
+    }
+
+    // 2. delete user ID from GroupMembers table
+    await prismaClient.groupMembers.deleteMany({
+      where: {
+        GroupID: groupId,
+        UserID: userId
+      }
+    })
+
+    // 3. don't return anything
+  }
+
+  async deleteGroup(groupId: number, tx?: Prisma.TransactionClient): Promise<void> {
+    const prismaClient = tx || this.prisma;
+
+    // 1. find group
+    const targetGroup = await prismaClient.group.findUnique({
+      where: { GroupID: groupId }
+    })
+    if (!targetGroup) {
+      return
+    }
+
+    // 2. delete group
+    await prismaClient.group.delete({
+      where: { GroupID: groupId }
+    })
+  }
 }

@@ -44,7 +44,7 @@ model Group {
 model GroupMembers {
   User    User  @relation(fields: [UserID], references: [UserID])
   UserID  Int
-  Group   Group @relation(fields: [GroupID], references: [GroupID])
+  Group   Group @relation(fields: [GroupID], references: [GroupID], onDelete: Cascade)
   GroupID Int
 
   @@id([UserID, GroupID])
@@ -59,7 +59,7 @@ model Bill {
   Discount        Int?
   ReceiptImageURL String?  @map("Receipts_image_url")
 
-  Group   Group @relation(fields: [GroupID], references: [GroupID])
+  Group   Group @relation(fields: [GroupID], references: [GroupID], onDelete: Cascade)
   GroupID Int
 
   Items Item[]
