@@ -92,7 +92,7 @@ export class GroupService {
     const updatedGroup = await this.prisma.$transaction(async (tx) => {
 
       // 2. authorization layer
-      const groupToUpdate = await this.groupRepository.getGroupById(groupId, tx);
+      const groupToUpdate = await this.groupRepository.getGroupById(groupId);
       if (!groupToUpdate) {
         throw new NotFoundException(`Group dengan ID ${groupId} tidak ditemukan.`);
       }
@@ -121,7 +121,7 @@ export class GroupService {
     const updatedGroup = await this.prisma.$transaction(async (tx) => {
 
       // 2. check if group exists
-      const targetGroup = await this.groupRepository.getGroupById(groupId, tx);
+      const targetGroup = await this.groupRepository.getGroupById(groupId);
       if (!targetGroup) {
         throw new NotFoundException(`Group dengan ID ${groupId} tidak ditemukan.`);
       }
@@ -141,7 +141,7 @@ export class GroupService {
 
   async deleteGroup(groupId: number, authUser: UserResponse): Promise<string> {
     const updatedGroup = await this.prisma.$transaction(async (tx) => {
-      const targetGroup = await this.groupRepository.getGroupById(groupId, tx);
+      const targetGroup = await this.groupRepository.getGroupById(groupId);
       if (!targetGroup) {
         throw new NotFoundException(`Group dengan ID ${groupId} tidak ditemukan.`);
       }
@@ -153,5 +153,28 @@ export class GroupService {
       return await this.groupRepository.deleteGroup(groupId, tx)
     })
     return `Deleted Group with Id ${groupId}`
+  }
+
+  // from member perspective
+  async leaveGroup(groupId: number, authUser: UserResponse): Promise<string> {
+    const updatedGroup = await this.prisma.$transaction(async (tx) => {
+      const targetGroup = await this.groupRepository.getGroupById(groupId);
+      if (!targetGroup) {
+        throw new NotFoundException(`Group dengan ID ${groupId} tidak ditemukan.`);
+      }
+
+      if (!targetGroup.getMembers().includes(authUser.UserId)) {
+        throw new BadRequestException('You are not the member of this group')
+      }
+
+      // TODO: Kalau user masih ada Bill yang belum di settle dalam Group, dia juga gabisa keluar
+
+      if (targetGroup.CreatedBy === authUser.Username) {
+        throw new UnauthorizedException('Admin can not leave group, admin better delete the group instead')
+      }
+
+      return await this.groupRepository.removeMember(groupId, authUser.UserId, tx)
+    })
+    return `Leaved Group with Id ${groupId}`
   }
 }
