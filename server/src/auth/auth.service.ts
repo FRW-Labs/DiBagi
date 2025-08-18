@@ -95,7 +95,7 @@ export class AuthService {
   }
 
   async refreshToken(userId: number, refreshToken: string): Promise<{ accessToken: string }> {
-    if (refreshToken == '') {
+    if (refreshToken === '') {
       throw new UnauthorizedException('Need a refresh token.');
     }
 
