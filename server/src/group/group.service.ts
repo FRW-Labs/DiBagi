@@ -121,7 +121,7 @@ export class GroupService {
     const updatedGroup = await this.prisma.$transaction(async (tx) => {
 
       // 2. check if group exists
-      const targetGroup = await this.getGroupById(groupId);
+      const targetGroup = await this.groupRepository.getGroupById(groupId, tx);
       if (!targetGroup) {
         throw new NotFoundException(`Group dengan ID ${groupId} tidak ditemukan.`);
       }
