@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { IUserRepository } from '../../domain/repository/i-user.repository';
-import { PrismaService } from '../database/prisma.service';
-import { User } from '../../domain/entity/user.entity';
+import { PrismaService } from '../common/prisma.service';
+import { User } from '../entity/user.entity';
 
 @Injectable()
-export class UserRepository implements IUserRepository {
-  // 1. inisialisasi Prisma ORM
+export class UserRepository {
+  // 1. inisialisasi prisma service
   constructor(private readonly prisma: PrismaService) {}
 
   async save(user: User): Promise<User> {
