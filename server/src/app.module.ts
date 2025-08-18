@@ -3,6 +3,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { LoggerMiddleware } from './common/logger.middleware';
 import { UserModule } from './user/user.module';
 import { GroupModule } from './group/group.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { GroupModule } from './group/group.module';
         limit: 10, // Batas 10 request per 60 detik dari satu IP
       },
     ]),
+    AuthModule,
     UserModule,
     GroupModule,
   ],

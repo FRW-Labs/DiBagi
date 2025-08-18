@@ -16,7 +16,7 @@ import { GroupResponse } from '../model/response/group.response';
 import { CreateGroupRequest, InviteUserDto } from '../model/request/group.request';
 import { JwtAuthGuard } from '../common/jwt.service';
 import { Auth } from '../common/user.decorator'
-import { UserResponse } from '../model/response/user.response';
+import { User } from '../entity/user.entity';
 
 @ApiTags('Group')
 @Controller('group')
@@ -28,7 +28,7 @@ export class GroupController {
   @ApiOperation({ summary: 'Create a new group' })
   @ApiResponse({ status: 201, description: 'Create new group', type: WebResponse<GroupResponse> })
   @ApiResponse({ status: 500, description: 'An error occured' })
-  async create(@Body() createGroupRequest:CreateGroupRequest, @Auth() user: UserResponse): Promise<WebResponse<GroupResponse>> {
+  async create(@Body() createGroupRequest:CreateGroupRequest, @Auth() user: User): Promise<WebResponse<GroupResponse>> {
     const group = await this.groupService.create(createGroupRequest, user)
     return {
       data: group,
@@ -40,7 +40,7 @@ export class GroupController {
   @ApiOperation({ summary: 'Invite a new member to a group' })
   @ApiResponse({ status: 201, description: 'Invite a new member to a group', type: WebResponse<GroupResponse> })
   @ApiResponse({ status: 404, description: 'Group or User not found' })
-  async invite(@Param('groupId', ParseIntPipe) groupId: number, @Body() inviteDto: InviteUserDto, @Auth() user: UserResponse): Promise<WebResponse<GroupResponse>> {
+  async invite(@Param('groupId', ParseIntPipe) groupId: number, @Body() inviteDto: InviteUserDto, @Auth() user: User): Promise<WebResponse<GroupResponse>> {
     const updatedGroup = await this.groupService.invite(groupId, inviteDto.userId, user)
     return {
       data: updatedGroup,
@@ -64,7 +64,7 @@ export class GroupController {
   @ApiOperation({ summary: 'Get groups for users' })
   @ApiResponse({ status: 400, description: 'User did not join any group' })
   @ApiResponse({ status: 200, description: 'Groups retrieved', type: WebResponse<GroupResponse[]> })
-  async getGroupsByUserId(@Auth() user: UserResponse): Promise<WebResponse<GroupResponse[]>> {
+  async getGroupsByUserId(@Auth() user: User): Promise<WebResponse<GroupResponse[]>> {
     const groups = await this.groupService.getGroupsByUserId(user)
 
     return {
@@ -77,7 +77,7 @@ export class GroupController {
   @ApiOperation({ summary: 'Update group with Id ${groupId}' })
   @ApiResponse({ status: 200, description: 'Update group with Id ${groupId}', type: WebResponse<GroupResponse> })
   @ApiResponse({ status: 404, description: 'Group not found' })
-  async update(@Param('groupId', ParseIntPipe) groupId: number, @Body() createGroupRequest: CreateGroupRequest, @Auth() user: UserResponse): Promise<WebResponse<GroupResponse>> {
+  async update(@Param('groupId', ParseIntPipe) groupId: number, @Body() createGroupRequest: CreateGroupRequest, @Auth() user: User): Promise<WebResponse<GroupResponse>> {
     const updatedGroup = await this.groupService.update(groupId, createGroupRequest, user)
 
     return {
@@ -90,7 +90,7 @@ export class GroupController {
   @ApiOperation({ summary: 'Remove member from the group' })
   @ApiResponse({ status: 200, description: 'Remove member from group', type: WebResponse<string> })
   @ApiResponse({ status: 404, description: 'Group or User not found' })
-  async removeMember(@Param('groupId', ParseIntPipe) groupId: number, @Param('userId', ParseIntPipe) userId: number, @Auth() user: UserResponse): Promise<WebResponse<string>> {
+  async removeMember(@Param('groupId', ParseIntPipe) groupId: number, @Param('userId', ParseIntPipe) userId: number, @Auth() user: User): Promise<WebResponse<string>> {
     const updatedGroup = await this.groupService.removeMember(groupId, userId, user)
 
     return {
@@ -103,7 +103,7 @@ export class GroupController {
   @ApiOperation({ summary: 'Delete group with Id ${groupId}' })
   @ApiResponse({ status: 200, description: 'Delete Group', type: WebResponse<string> })
   @ApiResponse({ status: 404, description: 'Group not found' })
-  async deleteGroup(@Param('groupId', ParseIntPipe) groupId: number, @Auth() user: UserResponse): Promise<WebResponse<string>> {
+  async deleteGroup(@Param('groupId', ParseIntPipe) groupId: number, @Auth() user: User): Promise<WebResponse<string>> {
     const deletedGroup = await this.groupService.deleteGroup(groupId, user)
 
     return {

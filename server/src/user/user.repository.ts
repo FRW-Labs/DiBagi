@@ -4,26 +4,7 @@ import { User } from '../entity/user.entity';
 
 @Injectable()
 export class UserRepository {
-  // 1. inisialisasi prisma service
   constructor(private readonly prisma: PrismaService) {}
-
-  async save(user: User): Promise<User> {
-    // step 1: define query-nya
-    const dataToSave = {
-      Username: user.Username,
-      Name: user.Name,
-      Email: user.Email,
-      Password: user.Password,
-    }
-
-    // step 2: execute query by prisma
-    const createdUserToDB = await this.prisma.user.create({
-      data: dataToSave,
-    })
-
-    // step 3: scan hasil-nya ke entity user
-    return User.create(createdUserToDB)
-  }
 
   async findById(id: number): Promise<User | null> {
     // step 1: define & execute query

@@ -41,7 +41,7 @@ export class UserResponse {
   // function buat ubah entity -> response
   static convertToResponse(user: User): UserResponse {
     const dto = new UserResponse();
-    dto.UserId = user.UserID
+    dto.UserId = user.UserId
     dto.Username = user.Username
     dto.Name = user.Name
     dto.Email = user.Email
@@ -52,14 +52,21 @@ export class UserResponse {
 
 export class LoginResponse {
   @ApiProperty({
-    description: 'JWT Token',
+    description: 'JWT Access Token',
     format: 'json',
   })
-  Token: string;
+  AccessToken: string;
 
-  static convertToResponse(token: string): LoginResponse {
+  @ApiProperty({
+    description: 'JWT Refresh Token',
+    format: 'json',
+  })
+  RefreshToken: string;
+
+  static convertToResponse(accessToken: string, refreshToken: string): LoginResponse {
     const dto = new LoginResponse();
-    dto.Token = token;
+    dto.AccessToken = accessToken;
+    dto.RefreshToken = refreshToken;
     return dto;
   }
 }

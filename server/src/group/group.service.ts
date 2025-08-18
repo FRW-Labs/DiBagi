@@ -11,6 +11,7 @@ import { GroupResponse } from '../model/response/group.response';
 import { UserResponse } from '../model/response/user.response';
 import { Group } from '../entity/group.entity';
 import { CreateGroupRequest } from '../model/request/group.request';
+import { User } from '../entity/user.entity';
 
 @Injectable()
 export class GroupService {
@@ -19,7 +20,7 @@ export class GroupService {
     private readonly prisma: PrismaService,
   ) {}
 
-  async create(req: CreateGroupRequest, creator: UserResponse): Promise<GroupResponse> {
+  async create(req: CreateGroupRequest, creator: User): Promise<GroupResponse> {
     // 1. convert request to entity
     const newGroupEntity = Group.new({
       Name: req.name,
@@ -34,7 +35,7 @@ export class GroupService {
     return GroupResponse.convertToResponse(savedGroup)
   }
 
-  async invite(groupId: number, userId: number, authUser: UserResponse): Promise<GroupResponse> {
+  async invite(groupId: number, userId: number, authUser: User): Promise<GroupResponse> {
     // 1. start transaction
     const updatedGroup = await this.prisma.$transaction(async (tx) => {
       // 2. get group first
@@ -76,7 +77,7 @@ export class GroupService {
     return GroupResponse.convertToResponse(foundedGroup);
   }
 
-  async getGroupsByUserId(authUser: UserResponse): Promise<GroupResponse[] | []> {
+  async getGroupsByUserId(authUser: User): Promise<GroupResponse[] | []> {
     // 1. call repository layer
     const foundedGroups = await this.groupRepository.getGroups(authUser.UserId)
 
@@ -87,7 +88,7 @@ export class GroupService {
     return foundedGroups.map(group => GroupResponse.convertToResponse(group));
   }
 
-  async update(groupId: number, req: CreateGroupRequest, authUser: UserResponse): Promise<GroupResponse> {
+  async update(groupId: number, req: CreateGroupRequest, authUser: User): Promise<GroupResponse> {
     // 1. start a transaction
     const updatedGroup = await this.prisma.$transaction(async (tx) => {
 
@@ -116,7 +117,7 @@ export class GroupService {
     return GroupResponse.convertToResponse(updatedGroup)
   }
 
-  async removeMember(groupId: number, userId: number, authUser: UserResponse): Promise<string> {
+  async removeMember(groupId: number, userId: number, authUser: User): Promise<string> {
     // 1. start transaction
     const updatedGroup = await this.prisma.$transaction(async (tx) => {
 
@@ -139,7 +140,7 @@ export class GroupService {
     return `Removed user with id ${userId} from group ${groupId}`
   }
 
-  async deleteGroup(groupId: number, authUser: UserResponse): Promise<string> {
+  async deleteGroup(groupId: number, authUser: User): Promise<string> {
     const updatedGroup = await this.prisma.$transaction(async (tx) => {
       const targetGroup = await this.groupRepository.getGroupById(groupId);
       if (!targetGroup) {
@@ -156,7 +157,7 @@ export class GroupService {
   }
 
   // from member perspective
-  async leaveGroup(groupId: number, authUser: UserResponse): Promise<string> {
+  async leaveGroup(groupId: number, authUser: User): Promise<string> {
     const updatedGroup = await this.prisma.$transaction(async (tx) => {
       const targetGroup = await this.groupRepository.getGroupById(groupId);
       if (!targetGroup) {
