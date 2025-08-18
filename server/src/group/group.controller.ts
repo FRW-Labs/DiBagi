@@ -1,22 +1,18 @@
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
   Param,
   ParseIntPipe,
   Post,
-  Query, UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { GroupService } from './group.service';
 import { WebResponse } from '../model/web.model';
 import { GroupResponse } from '../model/response/group.response';
 import { CreateGroupRequest, InviteUserDto } from '../model/request/group.request';
-import { Request } from 'express';
 import { JwtAuthGuard } from '../common/jwt.service';
-import { User } from '../entity/user.entity';
 import { Auth } from '../common/user.decorator'
 import { UserResponse } from '../model/response/user.response';
 
@@ -53,11 +49,24 @@ export class GroupController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Get group with id' })
   @ApiResponse({ status: 400, description: 'Group does not exist' })
-  @ApiResponse({ status: 200, description: 'Group found', type: WebResponse<UserResponse> })
-  async getGroupById(@Param('id') id: number): Promise<WebResponse<GroupResponse>> {
+  @ApiResponse({ status: 200, description: 'Group found', type: WebResponse<GroupResponse> })
+  async getGroupById(@Param('id', ParseIntPipe) id: number): Promise<WebResponse<GroupResponse>> {
     const group = await this.groupService.getGroupById(id)
     return {
       data: group,
+    }
+  }
+
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Get groups for users' })
+  @ApiResponse({ status: 400, description: 'User did not join any group' })
+  @ApiResponse({ status: 200, description: 'Groups retrieved', type: WebResponse<GroupResponse[]> })
+  async getGroupsByUserId(@Auth() user: UserResponse): Promise<WebResponse<GroupResponse[]>> {
+    const groups = await this.groupService.getGroupsByUserId(user)
+
+    return {
+      data: groups,
     }
   }
 }

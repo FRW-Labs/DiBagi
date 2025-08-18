@@ -11,7 +11,6 @@ import { GroupResponse } from '../model/response/group.response';
 import { UserResponse } from '../model/response/user.response';
 import { Group } from '../entity/group.entity';
 import { CreateGroupRequest } from '../model/request/group.request';
-import { User } from '../entity/user.entity';
 
 @Injectable()
 export class GroupService {
@@ -65,7 +64,7 @@ export class GroupService {
 
   async getGroupById(groupId: number): Promise<GroupResponse> {
     // 1. check if groupId is valid
-    if (!groupId || groupId < 0) {
+    if (!groupId || groupId <= 0) {
       throw new BadRequestException('Group ID tidak valid.');
     }
 
@@ -75,5 +74,16 @@ export class GroupService {
 
     // 3. convert entity to response
     return GroupResponse.convertToResponse(foundedGroup);
+  }
+
+  async getGroupsByUserId(authUser: UserResponse): Promise<GroupResponse[] | []> {
+    // 1. call repository layer
+    const foundedGroups = await this.groupRepository.getGroups(authUser.UserId)
+
+    // 2. if there are no group, return an empty array
+    if (!foundedGroups || foundedGroups.length === 0) return [];
+
+    // 3. if there are group, return the groups
+    return foundedGroups.map(group => GroupResponse.convertToResponse(group));
   }
 }

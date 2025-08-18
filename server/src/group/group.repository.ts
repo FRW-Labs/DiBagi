@@ -84,8 +84,38 @@ export class GroupRepository {
     await prismaClient.groupMembers.create({ data: dataToSave })
   }
 
-  // TODO: get group by user id
-  // TODO: update group info
+  async getGroups(userId: number): Promise<Group[]> {
+    // step 1: get groups where it has members that has the same user id
+    const groups = await this.prisma.group.findMany({
+      where: {
+        Members: {
+          some: {
+            UserID: userId,
+          }
+        }
+      },
+      include: {
+        Members: true
+      }
+    })
+
+    // step 2: map it into an array
+    return groups.map((group) => {
+      const memberIds = group.Members.map(member => member.UserID)
+      return Group.from({
+        GroupId: group.GroupID,
+        Name: group.Name,
+        Description: group.Description,
+        CreatedBy: group.CreatedByUser,
+        CreatedAt: group.CreatedAt,
+      })
+    })
+  }
+
+  // TODO: update group info (name & description)
+  async update(group: Group, groupId: number, tx?: Prisma.TransactionClient): Promise<void> {
+
+  }
   // TODO: remove group member
   // TODO: delete group
 }

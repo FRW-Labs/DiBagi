@@ -28,11 +28,6 @@ export class UserController {
 
   @Post('register')
   @ApiOperation({ summary: 'Register a user' })
-  @ApiResponse({
-    status: 201,
-    description: 'User Registered Successfully',
-    type: UserResponse,
-  })
   @ApiResponse({ status: 409, description: 'User Already Exists' })
   @ApiResponse({ status: 201, description: 'User Registered Successfully', type: WebResponse<UserResponse> })
   async register(@Body() registerDto: RegisterRequest): Promise<WebResponse<UserResponse>> {
@@ -44,11 +39,6 @@ export class UserController {
 
   @Post('login')
   @ApiOperation({ summary: 'Login a user' })
-  @ApiResponse({
-    status: 201,
-    description: 'User Login Successfully',
-    type: LoginResponse,
-  })
   @ApiResponse({ status: 401, description: 'Incorrect authentication' })
   @ApiResponse({ status: 200, description: 'User Login Successfully', type: WebResponse<LoginResponse> })
   async login(@Body() loginDto: LoginRequest): Promise<WebResponse<string>> {
