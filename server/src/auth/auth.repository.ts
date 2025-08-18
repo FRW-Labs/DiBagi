@@ -30,6 +30,5 @@ export class AuthRepository {
       data: { hashedRefreshToken: refreshToken }
     })
 
-    return
   }
 }
