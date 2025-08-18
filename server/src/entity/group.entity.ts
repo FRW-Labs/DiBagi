@@ -19,7 +19,7 @@ export class Group {
   }) {
     this.GroupId = props.GroupId;
     this.Name = props.Name;
-    this.Description = props.Description ?? '';
+    this.Description = props.Description;
     this.CreatedBy = props.CreatedBy;
     this.CreatedAt = props.CreatedAt;
     this.userIds = props.userIds;
