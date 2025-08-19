@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:dibagi_app/page/group_detail.dart';
 
 class HomePage extends StatelessWidget {
   HomePage({Key? key}) : super(key: key);
@@ -130,6 +131,7 @@ class HomePage extends StatelessWidget {
 
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
+        shape: const CircleBorder(),
         backgroundColor: Color.fromRGBO(200, 255, 186, 1),
         child: const Icon(Icons.add),
       ),
@@ -154,139 +156,164 @@ class GroupCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Nama receipt + total
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    // Gambar di sebelah kiri
-                    Image.asset(
-                      'assets/icons/iconSplitBill.png',
-                      height: 32,
-                      width: 32,
-                    ),
-                    const SizedBox(width: 8),
-
-                    // Title + Date
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          date,
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-
-                // Total harga tetap di kanan
-                Container(
-                  height: 40,
-                  alignment: Alignment.center,
-                  child: Text(
-                    total,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                SizedBox(
-                  width: 334,
-                  child: Divider(indent: 3, color: Colors.black, thickness: 1),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-
-            // People list
-            if (people.isNotEmpty)
-              Column(
-                children:
-                    people.map((p) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 2),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(p["name"]!),
-                            Text(
-                              p["amount"]!,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w500,
-                              ),
+    return InkWell(
+      // 👈 buat bisa ditekan
+      borderRadius: BorderRadius.circular(16),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder:
+                (_) => GroupDetailPage(title: title, date: date, total: total),
+          ),
+        );
+      },
+      child: Card(
+        margin: const EdgeInsets.only(bottom: 16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        elevation: 4,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ... isi card tetap sama kayak punyamu
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Image.asset(
+                        'assets/icons/iconSplitBill.png',
+                        height: 32,
+                        width: 32,
+                      ),
+                      const SizedBox(width: 8),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
                             ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            date,
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Container(
+                    height: 40,
+                    alignment: Alignment.center,
+                    child: Text(
+                      total,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ),
+                ],
               ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 334,
+                    child: Divider(
+                      indent: 3,
+                      color: Colors.black,
+                      thickness: 1,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
 
-            const SizedBox(height: 12),
+              // People list
+              if (people.isNotEmpty)
+                Column(
+                  children:
+                      people.map((p) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 2),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  // avatar
+                                  CircleAvatar(
+                                    radius: 16,
+                                    backgroundImage: AssetImage(
+                                      "assets/icons/iconSplitBill.png",
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(p["name"]!),
+                                ],
+                              ),
 
-            // Status
-            if (status == "active")
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: const Color.fromRGBO(200, 255, 186, 1),
-                  borderRadius: BorderRadius.circular(12),
+                              Text(
+                                p["amount"]!,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
                 ),
-                child: Text(
-                  "Your own: $your",
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+
+              const SizedBox(height: 12),
+
+              // Status
+              if (status == "active")
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color.fromRGBO(200, 255, 186, 1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    "Your own: $your",
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                )
+              else
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color.fromRGBO(255, 210, 186, 1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text(
+                    "Settled up",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
                   ),
                 ),
-              )
-            else
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: const Color.fromRGBO(255, 210, 186, 1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Text(
-                  "Settled up",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );
