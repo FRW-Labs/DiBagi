@@ -19,7 +19,19 @@ export class Item {
     this.userIds = props.userIds;
   }
 
-  public static create(props: {
+  public static new(props: {
+    Name: string;
+    Price: number;
+    BillId: number;
+    userIds: number[];
+  }): Item {
+    return new Item({
+      ...props,
+      ItemId: 'ini ceritanya id (default dulu aja karena bakal di set sama DB', // default value for creation only
+    })
+  }
+
+  public static from(props: {
     ItemId: string;
     BillId: number;
     Name: string;

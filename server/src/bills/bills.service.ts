@@ -4,10 +4,14 @@ import { BillsRequest } from '../model/request/bills.request';
 import { BillsResponse } from '../model/response/bills.response';
 import { Bill } from '../entity/bill.entity';
 import { PrismaService } from '../common/prisma.service';
+import { ItemRepository } from '../items/item.repository';
+import { DebtRepository } from '../debt/debt.repository';
 
 @Injectable()
 export class BillsService {
   constructor (@Inject(BillsRepository) private billsRepository: BillsRepository,
+    private itemRepository: ItemRepository,
+    private debtRepository: DebtRepository,
     private readonly prisma: PrismaService,
   ) {}
 
@@ -15,6 +19,7 @@ export class BillsService {
     // change request into entity
     const billEntity = Bill.new({
       Title: req.Title,
+      TotalAmount:
       TaxAndService: req.TaxAndService,
       Discount: req.Discount,
       ReceiptURL: req.ReceiptsImageUrl
@@ -27,5 +32,9 @@ export class BillsService {
 
     // convert result entity to response
     return BillsResponse.convertToResponse(resultEntity);
+  }
+
+  async calculateTotalAmount() {
+
   }
 }

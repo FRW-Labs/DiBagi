@@ -48,6 +48,7 @@ export class BillsRepository {
     return
   }
 
+  // TODO: beresin ini update function
   // async update(billId: number, bill: Bill, tx?: Prisma.TransactionClient): Promise<Bill> {
   //
   // }

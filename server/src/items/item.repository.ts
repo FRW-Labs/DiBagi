@@ -4,7 +4,7 @@ import { Item } from '../entity/item.entity';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
-export class ItemsRepository {
+export class ItemRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(item: Item, billId: number, userId: number, tx?: Prisma.TransactionClient): Promise<Item> {
@@ -36,7 +36,7 @@ export class ItemsRepository {
       }
     })
 
-    return Item.create({
+    return Item.from({
       ItemId: createdItem.ItemID,
       BillId: createdItem.BillID,
       Name: createdItem.Name,
