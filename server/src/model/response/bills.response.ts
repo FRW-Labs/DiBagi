@@ -1,5 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Bill } from '../../entity/bill.entity';
+import { IsArray, IsObject } from 'class-validator';
+import { ItemResponse } from './item.response';
+import { Item } from '../../entity/item.entity';
 
 export class BillsResponse {
   @ApiProperty({
@@ -58,7 +61,15 @@ export class BillsResponse {
   })
   ReceiptImageUrl: string;
 
-  static convertToResponse(bill: Bill): BillsResponse {
+  @ApiProperty({
+    description: 'Items',
+    format: 'array',
+  })
+  @IsArray()
+  @IsObject()
+  Items: ItemResponse[]
+
+  static convertToResponse(bill: Bill, items: Item[]): BillsResponse {
     const dto = new BillsResponse()
     dto.BillId = bill.BillId
     dto.GroupId = bill.GroupId
@@ -68,6 +79,7 @@ export class BillsResponse {
     dto.TaxAndService = bill.TaxAndService
     dto.Discount = bill.Discount
     dto.ReceiptImageUrl = bill.ReceiptURL
+    dto.Items = items.map(item => ItemResponse.convertToResponse(item))
     return dto
   }
 }

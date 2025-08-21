@@ -4,7 +4,7 @@ import { BillsRequest } from '../model/request/bills.request';
 import { BillsResponse } from '../model/response/bills.response';
 import { Bill } from '../entity/bill.entity';
 import { PrismaService } from '../common/prisma.service';
-import { ItemRepository } from '../items/item.repository';
+import { ItemRepository } from '../item/item.repository';
 import { DebtRepository } from '../debt/debt.repository';
 import { User } from '../entity/user.entity';
 import { CalculateTotalAmount } from '../common/calculator.service';
@@ -35,26 +35,34 @@ export class BillsService {
     })
 
     // 3. map item into entity and call repository layer
+    let itemsFromDB: Item[] = [];
     for (const item of req.Items) {
       const itemEntity = Item.new({
         BillId: item.BillId,
-        userIds: item.UserId, // TODO: pikirin ini item better one-to-one atau one-to-many
+        UserId: item.UserId,
         Name: item.Name,
         Price: item.Price,
       })
 
-      const itemsFromDB = await this.prisma.$transaction(async (tx) => {
-        return await this.itemRepository.create(itemEntity, billFromDB.BillId, item.UserId[0], tx) // TODO: keliatannya bakal dijadiin one-to-one relationship tapi sementara kek begini dulu
+      const itemsRepository = await this.prisma.$transaction(async (tx) => {
+        return await this.itemRepository.create(itemEntity, billFromDB.BillId, tx)
       })
+      itemsFromDB.push(itemsRepository)
 
       // 4. create/update debts table for each corresponding user
       const debtEntity = Debt.new({
         BillId: billFromDB.BillId,
-        UserId: itemsFromDB.getUsers(),
+        UserId: item.UserId,
+        AmountOwed: item.Price,
+        Status: "unpaid"
+      })
+
+      await this.prisma.$transaction(async (tx) => {
+        return await this.debtRepository.create(debtEntity, tx)
       })
     }
 
     // 5. return results
-    return BillsResponse.convertToResponse(billFromDB) // TODO: bagian response juga buat array of items buat kasih liat
+    return BillsResponse.convertToResponse(billFromDB, itemsFromDB)
   }
 }

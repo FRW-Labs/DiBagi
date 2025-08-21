@@ -7,26 +7,37 @@ import { Prisma } from '@prisma/client';
 export class DebtRepository {
   constructor(@Inject() private readonly prisma: PrismaService) {}
 
-  async create(billId: number, userId: number, debt: Debt, tx: Prisma.TransactionClient): Promise<Debt> {
+  async create(debt: Debt, tx: Prisma.TransactionClient): Promise<Debt> {
     const prismaClient = tx || this.prisma;
 
-    const dataToSave = {
-      BillID: billId,
-      UserID: userId,
-      AmountOwed: debt.AmountOwed,
-      Status: debt.Status,
-    }
-
-    const DebtEntity = await prismaClient.debt.create({
-      data: dataToSave
+    // 1. upsert method (create if debt doesn't exists, update if it exists)
+    const upsertedDebt = await prismaClient.debt.upsert({
+      where: {
+        UserID_BillID: {
+          UserID: debt.UserId,
+          BillID: debt.BillId
+        }
+      },
+      update: {
+        AmountOwed: {
+          increment: debt.AmountOwed,
+        },
+        Status: 'unpaid',
+      },
+      create: {
+        AmountOwed: debt.AmountOwed,
+        Status: 'unpaid',
+        Bill: { connect: { BillID: debt.BillId } },
+        User: { connect: { UserID: debt.UserId } },
+      }
     })
 
     return Debt.from({
-      DebtId: DebtEntity.DebtID,
-      BillId: DebtEntity.BillID,
-      UserId: DebtEntity.UserID,
-      AmountOwed: DebtEntity.AmountOwed,
-      Status: DebtEntity.Status,
-    })
+      DebtId: upsertedDebt.DebtID,
+      BillId: upsertedDebt.BillID,
+      UserId: upsertedDebt.UserID,
+      AmountOwed: upsertedDebt.AmountOwed,
+      Status: upsertedDebt.Status,
+    });
   }
 }

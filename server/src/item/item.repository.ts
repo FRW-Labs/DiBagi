@@ -7,7 +7,7 @@ import { Prisma } from '@prisma/client';
 export class ItemRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(item: Item, billId: number, userId: number, tx?: Prisma.TransactionClient): Promise<Item> {
+  async create(item: Item, billId: number, tx?: Prisma.TransactionClient): Promise<Item> {
     const prismaClient = tx || this.prisma
 
     const dataToSave = {
@@ -18,22 +18,15 @@ export class ItemRepository {
           BillID: billId,
         }
       },
-      Participants: {
-        create: [
-          {
-            User: {
-              connect: { UserID: userId }
-            }
-          }
-        ]
+      Payer: {
+        connect: {
+          UserID: item.UserId,
+        }
       }
     }
 
     const createdItem = await prismaClient.item.create({
       data: dataToSave,
-      include: {
-        Participants: true,
-      }
     })
 
     return Item.from({
@@ -41,7 +34,7 @@ export class ItemRepository {
       BillId: createdItem.BillID,
       Name: createdItem.Name,
       Price: createdItem.Price,
-      userIds: createdItem.Participants.map((p) => p.UserID),
+      UserId: createdItem.UserID,
     })
   }
 }

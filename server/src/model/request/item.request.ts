@@ -9,9 +9,8 @@ export class ItemRequest {
     required: true,
   })
   @IsNotEmpty()
-  @IsArray()
   @IsNumber()
-  UserId: number[];
+  UserId: number;
 
   @ApiProperty({
     description: 'Bill ID that contains this item',

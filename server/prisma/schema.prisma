@@ -22,10 +22,10 @@ model User {
   CreatedAt          DateTime @default(now()) @map("Created_at")
   hashedRefreshToken String?  @map("hashed_refresh_token")
 
-  CreatedGroups    Group[]            @relation("GroupCreator")
-  Groups           GroupMembers[]
-  Debts            Debt[]
-  ItemParticipants ItemParticipants[]
+  CreatedGroups Group[]        @relation("GroupCreator")
+  Groups        GroupMembers[]
+  Debts         Debt[]
+  PaidItems     Item[]
 }
 
 model Group {
@@ -75,17 +75,8 @@ model Item {
   Bill   Bill @relation(fields: [BillID], references: [BillID])
   BillID Int
 
-  Participants ItemParticipants[]
-}
-
-// Tabel join untuk relasi many-to-many Item dan User
-model ItemParticipants {
-  Item   Item   @relation(fields: [ItemID], references: [ItemID])
-  ItemID String
-  User   User   @relation(fields: [UserID], references: [UserID])
   UserID Int
-
-  @@id([ItemID, UserID])
+  Payer  User @relation(fields: [UserID], references: [UserID])
 }
 
 model Debt {
@@ -97,6 +88,8 @@ model Debt {
   BillID Int
   User   User @relation(fields: [UserID], references: [UserID])
   UserID Int
+
+  @@unique([UserID, BillID])
 }
 
 enum DebtStatus {
