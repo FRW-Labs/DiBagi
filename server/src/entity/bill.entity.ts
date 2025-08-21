@@ -36,6 +36,7 @@ export class Bill {
 
   public static new(props: {
     Title: string;
+    TotalAmount: number;
     TaxAndService?: number;
     Discount?: number;
     ReceiptURL?: string;
@@ -45,7 +46,6 @@ export class Bill {
       GroupId: 0,
       BillId: 0,
       BillDate: new Date(),
-      TotalAmount: 0,
       TaxAndService: props.TaxAndService ?? 0,
       Discount: props.Discount ?? 0,
       ReceiptURL: props.ReceiptURL ?? "",

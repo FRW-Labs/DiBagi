@@ -1,5 +1,13 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { ApiProperty } from "@nestjs/swagger";
+import { ItemRequest } from './item.request';
 
 export class BillsRequest {
   @ApiProperty({
@@ -13,6 +21,25 @@ export class BillsRequest {
   @IsString()
   @IsNotEmpty()
   Title: string;
+
+  @ApiProperty({
+    description: "Group ID",
+    format: "number",
+    required: true,
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  GroupId: number;
+
+  @ApiProperty({
+    description: "List of Item that inside the bills",
+    format: "array",
+    required: true,
+  })
+  @IsArray()
+  @IsObject()
+  @IsNotEmpty()
+  Items: ItemRequest[];
 
   @ApiProperty({
     description: "Tax and Service",
