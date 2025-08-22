@@ -10,8 +10,8 @@ import { BillsModule } from './bills/bills.module';
   imports: [
     ThrottlerModule.forRoot([
       {
-        ttl: 60000, // Waktu dalam milidetik (60 detik)
-        limit: 10, // Batas 10 request per 60 detik dari satu IP
+        ttl: 60,      // Waktu dalam detik (60 detik)
+        limit: 10,    // Batas 10 request per 60 detik dari satu IP
       },
     ]),
     AuthModule,
