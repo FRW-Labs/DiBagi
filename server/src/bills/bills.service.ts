@@ -10,6 +10,7 @@ import { User } from '../entity/user.entity';
 import { CalculateTotalAmount } from '../common/calculator.service';
 import { Item } from '../entity/item.entity';
 import { Debt } from '../entity/debt.entity';
+import { DebtStatus } from '@prisma/client';
 
 @Injectable()
 export class BillsService {

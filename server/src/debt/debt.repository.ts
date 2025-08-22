@@ -1,7 +1,7 @@
 import { PrismaService } from '../common/prisma.service';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Debt } from '../entity/debt.entity';
-import { Prisma } from '@prisma/client';
+import { DebtStatus, Prisma } from '@prisma/client';
 
 @Injectable()
 export class DebtRepository {
@@ -22,10 +22,6 @@ export class DebtRepository {
         AmountOwed: {
           increment: debt.AmountOwed,
         },
-        Status: 'unpaid',
-      },
-      create: {
-        AmountOwed: debt.AmountOwed,
         Status: DebtStatus.unpaid,
       },
       create: {
