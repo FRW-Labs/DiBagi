@@ -10,7 +10,7 @@ export class GroupRepository {
 
   async create(group: Group, creatorId: number, tx?: Prisma.TransactionClient): Promise<Group> {
     // 1. use transaction client
-    const prismaClient = tx || this.prisma;
+    const prismaClient = tx ?? this.prisma;
 
     const dataToSave = {
       Name: group.Name,
@@ -70,7 +70,7 @@ export class GroupRepository {
   }
 
   async invite(groupId: number, userId: number, tx?: Prisma.TransactionClient): Promise<void> {
-    const prismaClient = tx || this.prisma;
+    const prismaClient = tx ?? this.prisma;
     const dataToSave = {
       User: {
         connect: { UserID: userId }
@@ -114,7 +114,7 @@ export class GroupRepository {
   }
 
   async update(group: Group, tx?: Prisma.TransactionClient): Promise<Group> {
-    const prismaClient = tx || this.prisma;
+    const prismaClient = tx ?? this.prisma;
     // 1. define the changed data
     const dataToChange = {
       Name: group.Name,
@@ -142,7 +142,7 @@ export class GroupRepository {
   }
 
   async removeMember(groupId: number, userId: number, tx?: Prisma.TransactionClient): Promise<void> {
-    const prismaClient = tx || this.prisma;
+    const prismaClient = tx ?? this.prisma;
 
     // 1. check if group exists
     const targetGroup = await prismaClient.group.findUnique({
@@ -164,7 +164,7 @@ export class GroupRepository {
   }
 
   async deleteGroup(groupId: number, tx?: Prisma.TransactionClient): Promise<void> {
-    const prismaClient = tx || this.prisma;
+    const prismaClient = tx ?? this.prisma;
 
     // 1. find group
     const targetGroup = await prismaClient.group.findUnique({

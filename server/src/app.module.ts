@@ -4,6 +4,7 @@ import { LoggerMiddleware } from './common/logger.middleware';
 import { UserModule } from './user/user.module';
 import { GroupModule } from './group/group.module';
 import { AuthModule } from './auth/auth.module';
+import { BillsModule } from './bills/bills.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { AuthModule } from './auth/auth.module';
     AuthModule,
     UserModule,
     GroupModule,
+    BillsModule,
   ],
   controllers: [],
   providers: [

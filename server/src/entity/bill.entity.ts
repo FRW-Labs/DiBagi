@@ -8,6 +8,7 @@ export class Bill {
   public readonly Discount: number;
   public readonly ReceiptURL: string;
   private itemIds: string[];
+  private debtIds: number[];
 
   private constructor(props: {
     GroupId: number;
@@ -19,6 +20,7 @@ export class Bill {
     Discount: number;
     ReceiptURL: string;
     itemIds: string[];
+    debtIds: number[];
   }) {
     this.GroupId = props.GroupId;
     this.BillId = props.BillId;
@@ -29,26 +31,48 @@ export class Bill {
     this.Discount = props.Discount;
     this.ReceiptURL = props.ReceiptURL;
     this.itemIds = props.itemIds;
+    this.debtIds = props.debtIds;
   }
 
-  public static create(props: {
+  public static new(props: {
+    Title: string;
+    TotalAmount: number;
+    TaxAndService?: number;
+    Discount?: number;
+    ReceiptURL?: string;
+  }) : Bill {
+    return new Bill({
+      ...props,
+      GroupId: 0,
+      BillId: 0,
+      BillDate: new Date(),
+      TaxAndService: props.TaxAndService ?? 0,
+      Discount: props.Discount ?? 0,
+      ReceiptURL: props.ReceiptURL ?? "",
+      itemIds: [],
+      debtIds: [],
+    })
+  }
+
+  public static from(props: {
     GroupId: number;
     BillId: number;
     Title: string;
-    BillDate?: Date;
+    BillDate: Date;
     TotalAmount: number;
     TaxAndService?: number;
     Discount?: number;
     ReceiptURL?: string;
     itemIds?: string[];
+    debtIds?: number[];
   }) : Bill {
     return new Bill({
       ...props,
-      BillDate: props.BillDate ?? new Date(),
+      itemIds: props.itemIds ?? [],
+      debtIds: props.debtIds ?? [],
       TaxAndService: props.TaxAndService ?? 0,
       Discount: props.Discount ?? 0,
       ReceiptURL: props.ReceiptURL ?? "",
-      itemIds: props.itemIds ?? [],
     })
   }
 
@@ -64,5 +88,19 @@ export class Bill {
 
   public getItems(): string[] {
     return [...this.itemIds];
+  }
+
+  public addDebt(debtId: number) {
+    if (!this.debtIds.includes(debtId)) {
+      this.debtIds.push(debtId);
+    }
+  }
+
+  public removeDebt(debtId: number) {
+    this.debtIds = this.debtIds.filter(id => id !== debtId);
+  }
+
+  public getDebts(): number[] {
+    return [...this.debtIds];
   }
 }

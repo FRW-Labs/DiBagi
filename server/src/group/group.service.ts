@@ -28,10 +28,10 @@ export class GroupService {
       CreatedBy: creator.Username
     })
 
-    // 2. start transaction
+    // 2. call repository
     const savedGroup = await this.groupRepository.create(newGroupEntity, creator.UserId)
 
-    // 6. convert entity to response and return it
+    // 3. convert entity to response and return it
     return GroupResponse.convertToResponse(savedGroup)
   }
 
