@@ -8,7 +8,7 @@ export class ItemRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(item: Item, billId: number, tx?: Prisma.TransactionClient): Promise<Item> {
-    const prismaClient = tx || this.prisma
+    const prismaClient = tx ?? this.prisma
 
     const dataToSave = {
       Name: item.Name,

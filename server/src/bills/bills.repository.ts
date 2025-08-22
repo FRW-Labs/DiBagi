@@ -8,7 +8,7 @@ export class BillsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(bill: Bill, groupId: number, tx?: Prisma.TransactionClient): Promise<Bill> {
-    const prismaClient = tx || this.prisma
+    const prismaClient = tx ?? this.prisma
 
     const dataToSave = {
       GroupID: groupId,
@@ -37,7 +37,7 @@ export class BillsRepository {
   }
 
   async delete(billId: number, tx?: Prisma.TransactionClient): Promise<void> {
-    const prismaClient = tx || this.prisma
+    const prismaClient = tx ?? this.prisma
 
     // 1. delete bills
     await prismaClient.bill.delete({
@@ -54,7 +54,7 @@ export class BillsRepository {
   // }
 
   async getBillsByID(billId: number, tx?: Prisma.TransactionClient): Promise<Bill | null> {
-    const prismaClient = tx || this.prisma
+    const prismaClient = tx ?? this.prisma
 
     // 1. find bills
     const bill = await prismaClient.bill.findUnique({
@@ -88,7 +88,7 @@ export class BillsRepository {
   }
   
   async getBills(groupId: number, tx?: Prisma.TransactionClient): Promise<Bill[]> {
-    const prismaClient = tx || this.prisma
+    const prismaClient = tx ?? this.prisma
 
     const bills = await prismaClient.bill.findMany({
       where: { GroupID: groupId },

@@ -8,7 +8,7 @@ export class DebtRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(debt: Debt, tx: Prisma.TransactionClient): Promise<Debt> {
-    const prismaClient = tx || this.prisma;
+    const prismaClient = tx ?? this.prisma;
 
     // 1. upsert method (create if debt doesn't exists, update if it exists)
     const upsertedDebt = await prismaClient.debt.upsert({
