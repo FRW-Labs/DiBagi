@@ -7,10 +7,11 @@ import express from 'express';
 
 const server = express();
 
-export const createApp = async (expressInstance): Promise<any> => {
+async function bootstrap(expressInstance) {
   const app = await NestFactory.create(
     AppModule,
     new ExpressAdapter(expressInstance),
+    { snapshot: true }
   );
 
   app.enableCors({
@@ -32,7 +33,12 @@ export const createApp = async (expressInstance): Promise<any> => {
   SwaggerModule.setup('api-docs', app, document);
 
   await app.init();
-};
+  return app
+}
 
-createApp(server);
-export default server;
+const bootstrapPromise = bootstrap(server);
+
+export default async function handler(req, res) {
+  const app = await bootstrapPromise;
+  server(req, res);
+}
