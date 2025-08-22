@@ -61,7 +61,7 @@ export class BillsService {
 
       // 6. return results
       return BillsResponse.convertToResponse(billFromDB, itemsFromDB)
-    })
+    }, { timeout: 20000 })
     return finalBillEntity;
   }
 }
