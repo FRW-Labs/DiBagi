@@ -26,7 +26,11 @@ export class DebtRepository {
       },
       create: {
         AmountOwed: debt.AmountOwed,
-        Status: 'unpaid',
+        Status: DebtStatus.unpaid,
+      },
+      create: {
+        AmountOwed: debt.AmountOwed,
+        Status: DebtStatus.unpaid,
         Bill: { connect: { BillID: debt.BillId } },
         User: { connect: { UserID: debt.UserId } },
       }
