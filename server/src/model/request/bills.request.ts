@@ -4,10 +4,11 @@ import {
   IsNumber,
   IsObject,
   IsOptional,
-  IsString,
+  IsString, ValidateNested,
 } from 'class-validator';
 import { ApiProperty } from "@nestjs/swagger";
 import { ItemRequest } from './item.request';
+import { Type } from 'class-transformer';
 
 export class BillsRequest {
   @ApiProperty({
@@ -20,7 +21,7 @@ export class BillsRequest {
   })
   @IsString()
   @IsNotEmpty()
-  Title: string;
+  title: string;
 
   @ApiProperty({
     description: "Group ID",
@@ -29,17 +30,19 @@ export class BillsRequest {
   })
   @IsNumber()
   @IsNotEmpty()
-  GroupId: number;
+  groupid: number;
 
   @ApiProperty({
     description: "List of Item that inside the bills",
     format: "array",
+    type: [ItemRequest],
     required: true,
   })
   @IsArray()
-  @IsObject()
+  @ValidateNested({ each: true })
+  @Type(() => ItemRequest)
   @IsNotEmpty()
-  Items: ItemRequest[];
+  items: ItemRequest[];
 
   @ApiProperty({
     description: "Tax and Service",
@@ -49,7 +52,7 @@ export class BillsRequest {
   })
   @IsNumber()
   @IsOptional()
-  TaxAndService?: number;
+  taxandservice?: number;
 
   @ApiProperty({
     description: "Discount",
@@ -59,7 +62,7 @@ export class BillsRequest {
   })
   @IsNumber()
   @IsOptional()
-  Discount?: number;
+  discount?: number;
 
   @ApiProperty({
     description: "Image Url (Cloudinary Links)",
@@ -69,5 +72,5 @@ export class BillsRequest {
   })
   @IsString()
   @IsOptional()
-  ReceiptsImageUrl?: string;
+  receiptsimageurl?: string;
 }

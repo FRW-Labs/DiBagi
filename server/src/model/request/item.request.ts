@@ -10,17 +10,7 @@ export class ItemRequest {
   })
   @IsNotEmpty()
   @IsNumber()
-  UserId: number;
-
-  @ApiProperty({
-    description: 'Bill ID that contains this item',
-    type: 'number',
-    example: 1,
-    required: true,
-  })
-  @IsNumber()
-  @IsNotEmpty()
-  BillId: number;
+  userid: number;
 
   @ApiProperty({
     description: 'Name of the item',
@@ -30,7 +20,7 @@ export class ItemRequest {
   })
   @IsString()
   @IsNotEmpty()
-  Name: string;
+  name: string;
 
   @ApiProperty({
     description: 'Price of the item (in Rp)',
@@ -38,7 +28,7 @@ export class ItemRequest {
     example: 10000, // Rp. 10,000
     required: true,
   })
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
-  Price: number;
+  price: number;
 }

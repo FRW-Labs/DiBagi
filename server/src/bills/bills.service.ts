@@ -20,49 +20,47 @@ export class BillsService {
   ) {}
 
   async create(req: BillsRequest, user: User): Promise<BillsResponse> {
-    // 1. map bill into an entity
-    const billEntity = Bill.new({
-      Title: req.Title,
-      TaxAndService: req.TaxAndService,
-      Discount: req.Discount,
-      TotalAmount: CalculateTotalAmount(req.Items, req.TaxAndService, req.Discount),
-      ReceiptURL: req.ReceiptsImageUrl,
+    // 1. start a transaction
+    const finalBillEntity = await this.prisma.$transaction(async (tx) => {
+      // 2. map bill into an entity
+      const billEntity = Bill.new({
+        Title: req.title,
+        TaxAndService: req.taxandservice,
+        Discount: req.discount,
+        TotalAmount: CalculateTotalAmount(req.items, req.taxandservice, req.discount),
+        ReceiptURL: req.receiptsimageurl,
+      })
+
+      // 3. call bills repository
+      const billFromDB = await this.billsRepository.create(billEntity, req.groupid, tx)
+
+      // 4. map item into entity and call repository layer
+      let itemsFromDB: Item[] = [];
+      for (const item of req.items) {
+        const itemEntity = Item.new({
+          BillId: billFromDB.BillId,
+          UserId: item.userid,
+          Name: item.name,
+          Price: item.price,
+        })
+
+        const itemsRepository = await this.itemRepository.create(itemEntity, billFromDB.BillId, tx)
+        itemsFromDB.push(itemsRepository)
+
+        // 5. create/update debts table for each corresponding user
+        const debtEntity = Debt.new({
+          BillId: billFromDB.BillId,
+          UserId: item.userid,
+          AmountOwed: item.price,
+          Status: "unpaid"
+        })
+
+        await this.debtRepository.create(debtEntity, tx)
+      }
+
+      // 6. return results
+      return BillsResponse.convertToResponse(billFromDB, itemsFromDB)
     })
-
-    // 2. call bills repository
-    const billFromDB = await this.prisma.$transaction(async (tx) => {
-      return await this.billsRepository.create(billEntity, req.GroupId, tx)
-    })
-
-    // 3. map item into entity and call repository layer
-    let itemsFromDB: Item[] = [];
-    for (const item of req.Items) {
-      const itemEntity = Item.new({
-        BillId: item.BillId,
-        UserId: item.UserId,
-        Name: item.Name,
-        Price: item.Price,
-      })
-
-      const itemsRepository = await this.prisma.$transaction(async (tx) => {
-        return await this.itemRepository.create(itemEntity, billFromDB.BillId, tx)
-      })
-      itemsFromDB.push(itemsRepository)
-
-      // 4. create/update debts table for each corresponding user
-      const debtEntity = Debt.new({
-        BillId: billFromDB.BillId,
-        UserId: item.UserId,
-        AmountOwed: item.Price,
-        Status: "unpaid"
-      })
-
-      await this.prisma.$transaction(async (tx) => {
-        return await this.debtRepository.create(debtEntity, tx)
-      })
-    }
-
-    // 5. return results
-    return BillsResponse.convertToResponse(billFromDB, itemsFromDB)
+    return finalBillEntity;
   }
 }
