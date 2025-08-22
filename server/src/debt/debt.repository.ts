@@ -5,7 +5,7 @@ import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class DebtRepository {
-  constructor(@Inject() private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(debt: Debt, tx: Prisma.TransactionClient): Promise<Debt> {
     const prismaClient = tx || this.prisma;
