@@ -52,7 +52,7 @@ export class BillsService {
           BillId: billFromDB.BillId,
           UserId: item.userid,
           AmountOwed: item.price,
-          Status: "unpaid"
+          Status: DebtStatus.unpaid
         })
 
         await this.debtRepository.create(debtEntity, tx)
