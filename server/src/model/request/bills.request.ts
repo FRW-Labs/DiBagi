@@ -66,7 +66,7 @@ export class BillsRequest {
 
   @ApiProperty({
     description: "Image Url (Cloudinary Links)",
-    format: "number",
+    format: "uri",
     example: "https://www.cloudinary.com/v1/image/upload", // buat lanjut ke tahap 2
     required: false,
   })
