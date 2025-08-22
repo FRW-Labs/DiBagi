@@ -4,7 +4,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export class ItemRequest {
   @ApiProperty({
     description: 'Users who buy this item',
-    type: 'array',
+    type: 'number',
     example: 1,
     required: true,
   })
