@@ -12,11 +12,11 @@ ALTER TABLE "public"."Item" DROP COLUMN "UserID";
 
 -- CreateTable
 CREATE TABLE "public"."ItemParticipants" (
-    "ItemID" TEXT NOT NULL,
-    "UserID" INTEGER NOT NULL,
-    "Quantity" INTEGER NOT NULL,
+                                             "ItemID" TEXT NOT NULL,
+                                             "UserID" INTEGER NOT NULL,
+                                             "Quantity" INTEGER NOT NULL,
 
-    CONSTRAINT "ItemParticipants_pkey" PRIMARY KEY ("ItemID","UserID")
+                                             CONSTRAINT "ItemParticipants_pkey" PRIMARY KEY ("ItemID","UserID")
 );
 
 -- AddForeignKey

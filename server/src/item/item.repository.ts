@@ -7,6 +7,37 @@ import { Prisma } from '@prisma/client';
 export class ItemRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async create(item: Item, billId: number, tx?: Prisma.TransactionClient): Promise<Item> {
+    const prismaClient = tx ?? this.prisma
+
+    const dataToSave = {
+      Name: item.Name,
+      Price: item.Price,
+      Bill: {
+        connect: {
+          BillID: billId,
+        }
+      },
+      Payer: {
+        connect: {
+          UserID: item.UserId,
+        }
+      }
+    }
+
+    const createdItem = await prismaClient.item.create({
+      data: dataToSave,
+    })
+
+    return Item.from({
+      ItemId: createdItem.ItemID,
+      BillId: createdItem.BillID,
+      Name: createdItem.Name,
+      Price: createdItem.Price,
+      UserId: createdItem.UserID,
+    })
+  }
+
   async createMany(items: Item[], billId: number, tx?: Prisma.TransactionClient): Promise<Item[]> {
     const prismaClient = tx ?? this.prisma
 
