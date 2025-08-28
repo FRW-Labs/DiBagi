@@ -1,5 +1,5 @@
 import { BillsService } from './bills.service';
-import { BillsResponse } from '../model/response/bills.response';
+import { BillsArrayResponse, BillsResponse } from '../model/response/bills.response';
 import { WebResponse } from '../model/web.model';
 import { BillsRequest } from '../model/request/bills.request';
 import { User } from '../entity/user.entity';
@@ -34,4 +34,15 @@ export class BillsController {
       data: bill,
     }
   }
+  @Get('group/:groupId')
+  @UseGuards(JwtAuthGuard) // PERLU LOGIN GA? \
+  @ApiOperation({ summary: 'Get bills by group ID' })
+  @ApiResponse({ status: 200, description: 'Get bills by group ID', type: WebResponse<BillsArrayResponse[]> })
+  async getBillsByGroupId(@Param('groupId') groupId: number): Promise<WebResponse<BillsArrayResponse[]>> {
+    const bills = await this.billService.getBills(groupId)
+    return {
+      data: bills,
+    }
+  }
+
 }

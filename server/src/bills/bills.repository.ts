@@ -72,10 +72,10 @@ export class BillsRepository {
 
     const bills = await prismaClient.bill.findMany({
       where: { GroupID: groupId },
-      include: {
-        Items: true,
-        Debts: true,
-      }
+      // include: {
+      //   Items: true
+      //   Debts: true,
+      // }
     })
 
     return bills.map(bill => Bill.from({
@@ -87,8 +87,8 @@ export class BillsRepository {
       TaxAndService: bill.TaxAndService ?? 0,
       Discount: bill.Discount ?? 0,
       ReceiptURL: bill.ReceiptImageURL ?? '',
-      itemIds: bill.Items.map(item => item.ItemID),
-      debtIds: bill.Debts.map(debt => debt.DebtID)
+      // itemIds: bill.Items.map(item => item.ItemID),
+      // debtIds: bill.Debts.map(debt => debt.DebtID)
     }))
   }
 }

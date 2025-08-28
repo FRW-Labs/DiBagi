@@ -1,7 +1,7 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { BillsRepository } from './bills.repository';
 import { BillsRequest } from '../model/request/bills.request';
-import { BillsResponse } from '../model/response/bills.response';
+import { BillsArrayResponse, BillsResponse } from '../model/response/bills.response';
 import { Bill } from '../entity/bill.entity';
 import { PrismaService } from '../common/prisma.service';
 import { ItemRepository } from '../item/item.repository';
@@ -80,5 +80,13 @@ export class BillsService {
 
     // 2. Convert to Response
     return BillsResponse.convertToResponse(bill, items)
+  }
+  
+  async getBills(groupId: number): Promise<BillsArrayResponse[]> {
+    // 1. Hit Repository
+    const bills = await this.billsRepository.getBills(groupId)
+
+    // 2. Convert to Response
+    return bills.map(bill => BillsArrayResponse.convertToResponse(bill))
   }
 }
