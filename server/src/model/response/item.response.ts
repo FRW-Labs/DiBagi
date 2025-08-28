@@ -14,14 +14,14 @@ export class ItemResponse {
     required: true,
     example: 1
   })
-  BillID: number;
+  UserID: number;
 
   @ApiProperty({
     type: 'number',
     required: true,
     example: 1
   })
-  UserID: number;
+  BillID: number;
 
   @ApiProperty({
     type: 'string',
@@ -41,9 +41,9 @@ export class ItemResponse {
     const dto = new ItemResponse();
     dto.ItemID = item.ItemId
     dto.BillID = item.BillId
-    dto.UserID = item.UserId
     dto.Name = item.Name
     dto.Price = item.Price
+    dto.UserID = item.UserId
     return dto
   }
 }

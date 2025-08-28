@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { BillsRepository } from './bills.repository';
 import { BillsRequest } from '../model/request/bills.request';
 import { BillsResponse } from '../model/response/bills.response';
@@ -58,5 +58,27 @@ export class BillsService {
       return BillsResponse.convertToResponse(billFromDB, itemsFromDB)
     }, { timeout: 20000 })
     return finalBillEntity;
+  }
+
+  async getBillById(billId: number) : Promise<BillsResponse>{
+    // 1. Hit Repository
+    const bill=await this.billsRepository.getBillsByID(billId)
+    // 1.1 Hit Item Repository
+    if (!bill){
+      throw new NotFoundException()
+    }
+
+    const itemIds = bill.getItems();
+    const items: Item[] = []; // Initialize the array
+    for (const itemId of itemIds) {
+      const item = await this.itemRepository.getItemsbyId(itemId);
+      if (!item) {
+        throw new NotFoundException(`Item with ID ${itemId} not found.`); // Use itemId
+      }
+      items.push(item);
+    }
+
+    // 2. Convert to Response
+    return BillsResponse.convertToResponse(bill, items)
   }
 }

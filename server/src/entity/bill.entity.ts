@@ -34,6 +34,7 @@ export class Bill {
     this.debtIds = props.debtIds;
   }
 
+  // request >> entity
   public static new(props: {
     Title: string;
     TotalAmount: number;
@@ -54,6 +55,7 @@ export class Bill {
     })
   }
 
+  // database >> entity
   public static from(props: {
     GroupId: number;
     BillId: number;

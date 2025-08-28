@@ -4,7 +4,7 @@ import { WebResponse } from '../model/web.model';
 import { BillsRequest } from '../model/request/bills.request';
 import { User } from '../entity/user.entity';
 import { Auth } from '../common/user.decorator';
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from "../common/jwt.service";
 
@@ -20,6 +20,16 @@ export class BillsController {
   @ApiResponse({ status: 500, description: 'An error occured' })
   async create(@Body() billRequest: BillsRequest, @Auth() user: User): Promise<WebResponse<BillsResponse>> {
     const bill = await this.billService.create(billRequest, user)
+    return {
+      data: bill,
+    }
+  }
+  @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Get bill by ID' })
+  @ApiResponse({ status: 200, description: 'Get bill by ID', type: WebResponse<BillsResponse> })
+  async getBillById(@Param('id') id: number): Promise<WebResponse<BillsResponse>> {
+    const bill = await this.billService.getBillById(id)
     return {
       data: bill,
     }

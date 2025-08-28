@@ -66,4 +66,25 @@ export class ItemRepository {
       }),
     );
   }
+
+  async getItemsbyId(itemId: string, tx?:Prisma.TransactionClient): Promise<Item | null>{
+    const prismaClient = tx ?? this.prisma
+    const getItems = await prismaClient.item.findUnique({
+      where:{
+        ItemID: itemId,
+      }
+    })
+
+    if (!getItems){
+      return null
+    }
+
+    return Item.from({
+      ItemId: getItems.ItemID,
+      BillId: getItems.BillID,
+      Name: getItems.Name,
+      Price: getItems.Price,
+      UserId: getItems.UserID,
+    })
+  }
 }

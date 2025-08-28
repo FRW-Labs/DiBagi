@@ -1,7 +1,7 @@
 import { PrismaService } from '../common/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { Bill } from '../entity/bill.entity';
-import { Prisma } from '@prisma/client';
+import { DebtStatus, Prisma } from '@prisma/client';
 
 @Injectable()
 export class BillsRepository {
@@ -38,52 +38,32 @@ export class BillsRepository {
 
   async delete(billId: number, tx?: Prisma.TransactionClient): Promise<void> {
     const prismaClient = tx ?? this.prisma
-
-    // 1. delete bills
-    await prismaClient.bill.delete({
-      where: { BillID: billId }
-    })
-
-    // 2. return
-    return
   }
 
-  // TODO: beresin ini update function
-  // async update(billId: number, bill: Bill, tx?: Prisma.TransactionClient): Promise<Bill> {
-  //
-  // }
-
+  // 
   async getBillsByID(billId: number, tx?: Prisma.TransactionClient): Promise<Bill | null> {
     const prismaClient = tx ?? this.prisma
-
-    // 1. find bills
-    const bill = await prismaClient.bill.findUnique({
-      where: { BillID: billId },
-      include: {
+    const bills = await prismaClient.bill.findUnique({
+      where: {BillID : billId}, include: {
         Items: true,
         Debts: true,
+        // ketika butuh include dari tabel lain
       }
     })
-    if (!bill) {
+    if (!bills) {
       return null
     }
-
-    // 2. map item and debts
-    const itemIds = bill.Items.map(item => item.ItemID)
-    const debtsIds = bill.Debts.map(debt => debt.DebtID)
-
-    // 3. return
     return Bill.from({
-      GroupId: bill.GroupID,
-      BillId: bill.BillID,
-      Title: bill.Title,
-      BillDate: bill.BillDate,
-      TotalAmount: bill.TotalAmount,
-      TaxAndService: bill.TaxAndService ?? 0,
-      Discount: bill.Discount ?? 0,
-      ReceiptURL: bill.ReceiptImageURL ?? '',
-      itemIds: itemIds,
-      debtIds: debtsIds,
+      GroupId : bills.GroupID,
+      BillId : bills.BillID,
+      Title : bills.Title,
+      BillDate : bills.BillDate,
+      TotalAmount : bills.TotalAmount,
+      TaxAndService : bills.TaxAndService ?? 0, // number null
+      Discount : bills.Discount ?? 0, // number null
+      ReceiptURL : bills.ReceiptImageURL ?? '', // string null
+      itemIds : bills.Items.map(item => item.ItemID), // map untuk array, ngambil ID Item dalam Array
+      debtIds : bills.Debts.map(debt => debt.DebtID),
     })
   }
   
