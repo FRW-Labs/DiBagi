@@ -25,7 +25,7 @@ model User {
   CreatedGroups Group[]        @relation("GroupCreator")
   Groups        GroupMembers[]
   Debts         Debt[]
-  PaidItems     Item[]
+  ItemParticipants ItemParticipants[]
 }
 
 model Group {
@@ -75,8 +75,7 @@ model Item {
   Bill   Bill @relation(fields: [BillID], references: [BillID])
   BillID Int
 
-  UserID Int
-  Payer  User @relation(fields: [UserID], references: [UserID])
+  Participants ItemParticipants[]
 }
 
 model Debt {
@@ -90,6 +89,19 @@ model Debt {
   UserID Int
 
   @@unique([UserID, BillID])
+}
+
+model ItemParticipants {
+  Item   Item   @relation(fields: [ItemID], references: [ItemID])
+  ItemID String
+
+  User   User   @relation(fields: [UserID], references: [UserID])
+  UserID Int
+
+  Quantity Int
+
+
+  @@id([ItemID, UserID])
 }
 
 enum DebtStatus {
