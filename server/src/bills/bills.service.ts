@@ -35,29 +35,24 @@ export class BillsService {
       // 3. call bills repository
       const billFromDB = await this.billsRepository.create(billEntity, req.groupid, tx)
 
-      // 4. map item into entity and call repository layer
-      let itemsFromDB: Item[] = [];
-      for (const item of req.items) {
-        const itemEntity = Item.new({
-          BillId: billFromDB.BillId,
-          UserId: item.userid,
-          Name: item.name,
-          Price: item.price,
-        })
+      // 4. map item into entity and call repository layer (bulk insert)
+      const itemsData = req.items.map(item => Item.new({
+        BillId: billFromDB.BillId,
+        UserId: item.userid,
+        Name: item.name,
+        Price: item.price,
+      }))
+      const itemsFromDB =await this.itemRepository.createMany(itemsData, billFromDB.BillId, tx)
 
-        const itemsRepository = await this.itemRepository.create(itemEntity, billFromDB.BillId, tx)
-        itemsFromDB.push(itemsRepository)
+      // 5. map debt into entity and call repository layer (bulk insert)
+      const debtsData = req.items.map(item => Debt.new({
+        BillId: billFromDB.BillId,
+        UserId: item.userid,
+        AmountOwed: item.price,
+        Status: DebtStatus.unpaid,
+      }))
 
-        // 5. create/update debts table for each corresponding user
-        const debtEntity = Debt.new({
-          BillId: billFromDB.BillId,
-          UserId: item.userid,
-          AmountOwed: item.price,
-          Status: DebtStatus.unpaid
-        })
-
-        await this.debtRepository.create(debtEntity, tx)
-      }
+      await this.debtRepository.upsertMany(debtsData, tx)
 
       // 6. return results
       return BillsResponse.convertToResponse(billFromDB, itemsFromDB)
