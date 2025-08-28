@@ -10,8 +10,7 @@ export class ItemRequest {
   })
   @IsNotEmpty()
   @IsNumber()
-  @IsArray()
-  userid: number[];
+  userid: number;
 
   @ApiProperty({
     description: 'Name of the item',
