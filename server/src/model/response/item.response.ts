@@ -21,7 +21,7 @@ export class ItemResponse {
     required: true,
     example: 1
   })
-  UserID: number;
+  UserID: number[];
 
   @ApiProperty({
     type: 'string',
