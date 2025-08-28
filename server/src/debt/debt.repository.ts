@@ -40,43 +40,4 @@ export class DebtRepository {
       Status: upsertedDebt.Status,
     });
   }
-
-  async upsertMany(debts: Debt[], tx?: Prisma.TransactionClient): Promise<Debt[]> {
-    const prismaClient = tx ?? this.prisma;
-
-    const results = await Promise.all(
-      debts.map((debt) =>
-        prismaClient.debt.upsert({
-          where: {
-            UserID_BillID: {
-              UserID: debt.UserId,
-              BillID: debt.BillId,
-            },
-          },
-          update: {
-            AmountOwed: {
-              increment: debt.AmountOwed,
-            },
-            Status: DebtStatus.unpaid,
-          },
-          create: {
-            AmountOwed: debt.AmountOwed,
-            Status: DebtStatus.unpaid,
-            BillID: debt.BillId,
-            UserID: debt.UserId,
-          },
-        }),
-      ),
-    );
-
-    return results.map((d) =>
-      Debt.from({
-        DebtId: d.DebtID,
-        BillId: d.BillID,
-        UserId: d.UserID,
-        AmountOwed: d.AmountOwed,
-        Status: d.Status,
-      }),
-    );
-  }
 }

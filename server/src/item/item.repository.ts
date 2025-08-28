@@ -47,33 +47,4 @@ export class ItemRepository {
       UserId: createdItem.UserID,
     })
   }
-
-  async createMany(items: Item[], billId: number, tx?: Prisma.TransactionClient): Promise<Item[]> {
-    const prismaClient = tx ?? this.prisma
-
-    const dataToSave = items.map((item) => ({
-      Name: item.Name,
-      Price: item.Price,
-      BillID: billId,
-      UserID: item.UserId,
-    }))
-
-    await prismaClient.item.createMany({
-      data: dataToSave
-    })
-
-    const itemsFromDB = await prismaClient.item.findMany({
-      where: { BillID: billId },
-    });
-
-    return itemsFromDB.map((i) =>
-      Item.from({
-        ItemId: i.ItemID,
-        BillId: i.BillID,
-        Name: i.Name,
-        Price: i.Price,
-        UserId: i.UserID,
-      }),
-    );
-  }
 }
