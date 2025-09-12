@@ -79,4 +79,23 @@ export class DebtRepository {
       }),
     );
   }
+
+  async getDebt(billId: number, tx?: Prisma.TransactionClient): Promise<Debt[]> {
+    const prismaClient = tx ?? this.prisma
+    const debts = await prismaClient.debt.findMany({
+      where: {BillID : billId}, include:{
+        User: true,
+        Bill: true
+      }
+    })
+    return debts.map((d) =>
+      Debt.from({
+        DebtId: d.DebtID,
+        BillId: d.BillID,
+        UserId: d.UserID,
+        AmountOwed: d.AmountOwed,
+        Status: d.Status,
+      }),
+    );
+  }
 }

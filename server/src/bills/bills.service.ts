@@ -81,11 +81,16 @@ export class BillsService {
     // 2. Convert to Response
     return BillsResponse.convertToResponse(bill, items)
   }
-  
+
   async getBills(groupId: number): Promise<BillsArrayResponse[]> {
     // 1. Hit Repository
     const bills = await this.billsRepository.getBills(groupId)
 
+    // CONDITIONAL
+    if (!bills || bills.length === 0){
+      throw new NotFoundException(`No bills found for group ID ${groupId}`);
+    }
+    
     // 2. Convert to Response
     return bills.map(bill => BillsArrayResponse.convertToResponse(bill))
   }

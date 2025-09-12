@@ -34,9 +34,6 @@ export class Item {
   public static from(props: {
     ItemId: string;
     BillId: number;
-
-    UserId: number;
-
     Name: string;
     Price: number;
     UserId: number;
