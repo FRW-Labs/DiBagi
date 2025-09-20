@@ -94,4 +94,57 @@ export class BillsService {
     // 2. Convert to Response
     return bills.map(bill => BillsArrayResponse.convertToResponse(bill))
   }
+
+  async update(billId: number, req: BillsRequest, user: User): Promise<BillsResponse> {
+    // 1. start a transaction
+    const updatedBill = await this.prisma.$transaction(async (tx) =>{
+
+      // 2. authorization layer
+      const billToUpdate = await this.billsRepository.getBillsByID(billId);
+      if (!billToUpdate) {
+        throw new NotFoundException(`Bill dengan ID ${billId} tidak ditemukan.`);
+      }
+      if (billToUpdate.GroupId !== req.groupid) {
+        throw new NotFoundException(`Bill dengan ID ${billId} tidak ditemukan di group ${req.groupid}.`);
+      }
+
+      // 3. map bill into an entity
+     const billEntity = Bill.from({
+        GroupId: req.groupid,
+        BillId: billId,
+        Title: req.title,
+        TaxAndService: req.taxandservice,
+        Discount: req.discount,
+        TotalAmount: CalculateTotalAmount(
+          req.items, 
+          req.taxandservice, 
+          req.discount
+        ),
+        // ReceiptURL: req.receiptsimageurl,
+        BillDate : billToUpdate.BillDate,
+    })
+    // 4. call bills repository
+    return await this.billsRepository.update(billEntity, tx)
+  })
+  // 5. convert to response
+  return BillsResponse.convertToResponse(updatedBill, [])
+  }
+  
+  async deleteBill(billId: number, user: User): Promise<string> {
+    // 1. start a transaction
+    const updatedBill = await this.prisma.$transaction(async (tx) => {
+      // 2. authorization layer
+      const targetBill = await this.billsRepository.getBillsByID(billId);
+      if (!targetBill) {
+        throw new NotFoundException(`Bill dengan ID ${billId} tidak ditemukan.`);
+      }
+
+      if (targetBill.GroupId !== targetBill.BillId) {
+        throw new NotFoundException(`Bill dengan ID ${billId} tidak ditemukan di group ${targetBill.GroupId}.`);
+      }
+
+      return await this.billsRepository.deleteBill(billId, tx)
+    })
+    return `Deleted bill with id ${billId}`
+  }
 }

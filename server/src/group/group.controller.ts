@@ -59,7 +59,7 @@ export class GroupController {
     }
   }
 
-  @Get()
+  @Get('gets:by-user') //? CEK LAGI DONG
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Get groups for users' })
   @ApiResponse({ status: 400, description: 'User did not join any group' })

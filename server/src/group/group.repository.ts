@@ -131,6 +131,7 @@ export class GroupRepository {
     })
 
     const memberIds = editedGroup.Members.map(member => member.UserID)
+    
     return Group.from({
       GroupId: editedGroup.GroupID,
       Name: editedGroup.Name,

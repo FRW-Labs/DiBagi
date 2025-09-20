@@ -87,4 +87,58 @@ export class ItemRepository {
       UserId: getItems.UserID,
     })
   }
+
+  async getItem(billId: number): Promise<Item[]>{
+    // setp 1: get items where it has bill id that is the same as billId
+    const bills = await this.prisma.item.findMany({
+      where: {
+        Bill : {
+          BillID: billId // filter bills by billId
+        }
+      },
+      include: {
+        Bill: true
+      }
+    })
+
+    // step 2: map it into an array
+    return bills.map((item) => {
+      const billIds = bills.map(bill => bill.BillID) // ???
+      return Item.from({
+        ItemId: item.ItemID,
+        BillId: item.Bill.BillID,
+        Name: item.Name,
+        Price: item.Price,
+        UserId: item.UserID,
+      })
+    })
+  }
+
+  async update(item: Item, tx?: Prisma.TransactionClient): Promise<Item> {
+    const prismaClient = tx ?? this.prisma;
+    // 1. define the changed data
+    const dataToChange = {
+      Name: item.Name,
+      Price: item.Price,
+    }
+
+    // 2. update the item
+    const editedItem = await prismaClient.item.update({
+      where: { ItemID: item.ItemId },
+      data: dataToChange,
+      include: {
+        Bill: true
+      }
+    })
+
+    const billId = editedItem.Bill.BillID
+
+    return Item.from({
+      ItemId: editedItem.ItemID,
+      BillId: billId,
+      Name: editedItem.Name,
+      Price: editedItem.Price,
+      UserId: editedItem.UserID,
+    })
+  }
 }

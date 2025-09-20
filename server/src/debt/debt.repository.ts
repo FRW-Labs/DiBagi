@@ -2,12 +2,13 @@ import { PrismaService } from '../common/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { Debt } from '../entity/debt.entity';
 import { DebtStatus, Prisma } from '@prisma/client';
+import { DebtArrayResponse } from 'src/model/response/debt.response';
 
 @Injectable()
 export class DebtRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(debt: Debt, tx: Prisma.TransactionClient): Promise<Debt> {
+  async create(debt: Debt, tx?: Prisma.TransactionClient): Promise<Debt> {
     const prismaClient = tx ?? this.prisma;
 
     // 1. upsert method (create if debt doesn't exists, update if it exists)
@@ -80,22 +81,27 @@ export class DebtRepository {
     );
   }
 
-  async getDebt(billId: number, tx?: Prisma.TransactionClient): Promise<Debt[]> {
-    const prismaClient = tx ?? this.prisma
-    const debts = await prismaClient.debt.findMany({
-      where: {BillID : billId}, include:{
-        User: true,
-        Bill: true
+  async getDebt(billId: number, tx? : Prisma.TransactionClient): Promise<Debt[]> {
+    // Step 1 : Get bill where it has member that has the same user id
+    const prismaClient = tx ?? this.prisma;
+    const userDebt = await prismaClient.debt.findMany({
+      where: { BillID : billId }, 
+       include: {
+          User: true,
+          Bill: true
+        }
+      })
+
+      if (!userDebt) {
+        return [];
       }
-    })
-    return debts.map((d) =>
-      Debt.from({
-        DebtId: d.DebtID,
-        BillId: d.BillID,
-        UserId: d.UserID,
-        AmountOwed: d.AmountOwed,
-        Status: d.Status,
-      }),
-    );
+
+      return userDebt.map(debt => Debt.from({
+        DebtId: debt.DebtID,
+        BillId: debt.BillID,
+        UserId: debt.UserID,
+        AmountOwed: debt.AmountOwed,
+        Status: debt.Status,
+        }))
+    }
   }
-}

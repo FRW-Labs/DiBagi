@@ -1,8 +1,12 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { BadRequestException, Inject, Injectable } from "@nestjs/common";
 import { DebtRepository } from "./debt.repository";
 import { PrismaService } from "src/common/prisma.service";
 import { BillsRepository } from "src/bills/bills.repository";
 import { UserRepository } from "src/user/user.repository";
+import { Debt } from "@prisma/client";
+import { BillsArrayResponse } from "src/model/response/bills.response";
+import { DebtArrayResponse, DebtResponse } from "src/model/response/debt.response";
+import { Debt, Debt } from "src/entity/debt.entity";
 
 @Injectable()
 export class DebtService {
@@ -22,13 +26,13 @@ export class DebtService {
             }
 
             // 3. Check if the user exists
-            const user = await this.userRepository.findById(userId, tx);
+            const user = await this.userRepository.findById(userId);
             if (!user) {
                 throw new Error('User not found');
             }
 
             // 4. Update the debt status to 'paid'
-            const debt = await this.debtRepository.prisma.debt.updateMany({
+            const debt = await this.debtRepository.updateMany({
                 where: {
                     BillID: billId,
                     UserID: userId,
@@ -46,20 +50,16 @@ export class DebtService {
         return settleDebt;
     }
 
-    async getDebts(userId: number): Promise<any[]>{
-        // 1. start a transaction
-        const debts = await this.prisma.$transaction (
-        async (tx) => {
-            // 2. Check if the user exists
-            const user = await this.userRepository.findById(userId, tx);
-            if (!user) {
-                throw new Error('User not found');
-            }
+    async getDebt(userId: number): Promise<DebtArrayResponse[]>{
+        // 1. Hit the repository 
+        const debts = await this.debtRepository.getDebt(userId);
+        
+        // Conditional
+        if (!debts || debts.length === 0) {
+            throw new BadRequestException('No debts found for this user');
+        }
 
-            // 3. Get the user's debts
-            const debts = await this.debtRepository.getDebt(userId, tx);
-            return debts;
-        });
-        return debts;
+        // 2. Convert to response
+        return debts.map(debt => DebtArrayResponse.convertToResponse(debt));
     }
 }
