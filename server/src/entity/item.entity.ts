@@ -4,6 +4,7 @@ export class Item {
   public readonly BillId: number;
   public readonly Name: string;
   public readonly Price: number;
+  CreatedBy: null;
 
   private constructor(props: {
     ItemId: string;
@@ -34,9 +35,6 @@ export class Item {
   public static from(props: {
     ItemId: string;
     BillId: number;
-
-    UserId: number;
-
     Name: string;
     Price: number;
     UserId: number;

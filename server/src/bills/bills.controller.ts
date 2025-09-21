@@ -1,10 +1,10 @@
 import { BillsService } from './bills.service';
-import { BillsResponse } from '../model/response/bills.response';
+import { BillsArrayResponse, BillsResponse } from '../model/response/bills.response';
 import { WebResponse } from '../model/web.model';
 import { BillsRequest } from '../model/request/bills.request';
 import { User } from '../entity/user.entity';
 import { Auth } from '../common/user.decorator';
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from "../common/jwt.service";
 
@@ -34,4 +34,41 @@ export class BillsController {
       data: bill,
     }
   }
+  @Get('group/:groupId')
+  @UseGuards(JwtAuthGuard) // PERLU LOGIN GA? \
+  @ApiOperation({ summary: 'Get bills by group ID' })
+  @ApiResponse({ status: 200, description: 'Get bills by group ID', type: WebResponse<BillsArrayResponse[]> })
+  async getBillsByGroupId(@Param('groupId') groupId: number): Promise<WebResponse<BillsArrayResponse[]>> {
+    const bills = await this.billService.getBills(groupId)
+    return {
+      data: bills,
+    }
+  }
+
+  @Put(':billId/update')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Update a bill by Id ${billId}' })
+  @ApiResponse({ status: 200, description: 'Update a bill by Id', type: WebResponse<BillsResponse> })
+  @ApiResponse({ status: 404, description: 'Bill not found' })
+  async updateBill(@Param('billId') billId: number, @Body() req: BillsRequest, @Auth() user: User): Promise<WebResponse<BillsResponse>> {
+    const updatedBill = await this.billService.update(billId, req, user);
+    return {
+      data: updatedBill,
+    }
+  }
+
+  @Delete(':billId/delete')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Delete a bill by Id ${billId}' })
+  @ApiResponse({ status: 200, description: 'Delete a bill by Id', type: WebResponse<null> })
+  @ApiResponse({ status: 404, description: 'Bill not found' })
+  async deleteBill(@Param('billId', ParseIntPipe) billId: number, @Auth() user: User): Promise<WebResponse<null>> {
+    const deletedBill = await this.billService.deleteBill(billId, user);
+
+    return {
+      // Ini dapet darimana?
+      data: deletedBill,
+    }
+  }
+
 }

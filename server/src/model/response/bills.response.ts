@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Bill } from '../../entity/bill.entity';
-import { IsArray, IsObject } from 'class-validator';
+import { IsArray, IsDate, IsNumber, IsObject, IsString } from 'class-validator';
 import { ItemResponse } from './item.response';
 import { Item } from '../../entity/item.entity';
 
@@ -80,6 +80,55 @@ export class BillsResponse {
     dto.Discount = bill.Discount
     dto.ReceiptImageUrl = bill.ReceiptURL
     dto.Items = items.map(item => ItemResponse.convertToResponse(item))
+    // data transfer object || Encapsulation, REQUEST RESPONSE.
+    return dto
+  }
+}
+
+export class BillsArrayResponse {
+  // Bill Id
+  @ApiProperty({
+    description: 'BillID By GroupID',
+    format: 'number',
+    example: '1'
+  })
+  @IsNumber()
+  BillId: number
+  
+  // Title
+  @ApiProperty({
+    description: 'Bill Title',
+    format: 'string',
+    example: 'Paradise Kitchen'
+  })
+  @IsString()
+  Title: string
+
+  // Bill Date
+  @ApiProperty({
+    description: 'Date',
+    format: 'date',
+    example: '2021-01-01'
+  })
+  @IsDate()
+  BillDate: Date;
+
+  // TotalAmount
+  @ApiProperty({
+    description: 'Total Amount',
+    format: 'number',
+    example: '1000'
+  })
+  @IsNumber()
+  TotalAmount: number;
+
+  static convertToResponse(bill: Bill): BillsArrayResponse {
+    const dto = new BillsArrayResponse()
+    dto.BillId = bill.BillId
+    dto.Title = bill.Title
+    dto.BillDate = bill.BillDate
+    dto.TotalAmount = bill.TotalAmount
+    // data transfer object || Encapsulation, REQUEST RESPONSE.
     return dto
   }
 }

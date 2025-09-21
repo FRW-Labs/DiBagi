@@ -72,10 +72,10 @@ export class BillsRepository {
 
     const bills = await prismaClient.bill.findMany({
       where: { GroupID: groupId },
-      include: {
-        Items: true,
-        Debts: true,
-      }
+      // include: {
+      //   Items: true
+      //   Debts: true,
+      // }
     })
 
     return bills.map(bill => Bill.from({
@@ -87,8 +87,63 @@ export class BillsRepository {
       TaxAndService: bill.TaxAndService ?? 0,
       Discount: bill.Discount ?? 0,
       ReceiptURL: bill.ReceiptImageURL ?? '',
-      itemIds: bill.Items.map(item => item.ItemID),
-      debtIds: bill.Debts.map(debt => debt.DebtID)
+      // itemIds: bill.Items.map(item => item.ItemID),
+      // debtIds: bill.Debts.map(debt => debt.DebtID)
     }))
   }
-}
+
+  async update(bill: Bill, tx?: Prisma.TransactionClient): Promise<Bill> {
+    const prismaClient = tx ?? this.prisma;
+
+    // 1. Define the changed data
+    const dataToChange = {
+      Title: bill.Title,
+      total_amount: bill.TotalAmount,
+      tax_and_service: bill.TaxAndService,
+      discount: bill.Discount,
+      //receipt_image_url: bill.ReceiptURL,
+    }
+
+    // 2. Update the bill
+    const editedBill = await prismaClient.bill.update({
+      where: { BillID: bill.BillId },
+      data: dataToChange,
+      include: {
+        Items: true,
+        Debts: true,
+      }
+    })
+
+    const itemIds = editedBill.Items.map(item => item.ItemID)
+    const debtIds = editedBill.Debts.map(debt => debt.DebtID)
+
+    // 3. Return the entity
+    return Bill.from({
+      GroupId: editedBill.GroupID,
+      BillId: editedBill.BillID,
+      Title: editedBill.Title,
+      BillDate: editedBill.BillDate,
+      TotalAmount: editedBill.TotalAmount,
+      TaxAndService: editedBill.TaxAndService ?? 0,
+      Discount: editedBill.Discount ?? 0,
+      ReceiptURL: editedBill.ReceiptImageURL ?? '',
+      itemIds : editedBill.Items.map(item => item.ItemID), // map untuk array, ngambil ID Item dalam Array
+      debtIds : editedBill.Debts.map(debt => debt.DebtID),
+    })
+  }
+
+  async deleteBill(billId: number, tx?: Prisma.TransactionClient): Promise<void> {
+    const prismaClient = tx ?? this.prisma;
+
+    const targetBill = await prismaClient.bill.findUnique({
+      where: { BillID: billId }
+    })
+    if (!targetBill) {
+      throw new Error('Bill not found');
+    }
+
+      await prismaClient.bill.delete({
+        where: { BillID: billId }
+      })
+    }
+  }
