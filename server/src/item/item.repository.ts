@@ -141,4 +141,21 @@ export class ItemRepository {
       UserId: editedItem.UserID,
     })
   }
+
+  async deleteItem(itemId: string, tx?: Prisma.TransactionClient): Promise<void> {
+    const prismaClient = tx ?? this.prisma;
+
+    // 1. find item by itemId
+    const targetItem = await prismaClient.item.findUnique({
+      where: { ItemID: itemId }
+    })
+    if (!targetItem) {
+      return
+    }
+
+    // 2. Delete Item
+    await prismaClient.item.delete({
+      where: { ItemID: itemId }
+    })
+  }
 }

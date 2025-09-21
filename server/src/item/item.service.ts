@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { ItemRepository } from './item.repository';
 import { Item } from 'src/entity/item.entity';
 import { ItemResponse } from 'src/model/response/item.response';
@@ -22,5 +22,16 @@ export class ItemService {
 
     // 3. Konversi entity -> DTO Response
     return items.map(item => ItemResponse.convertToResponse(item));
+  }
+
+  async deleteItem(itemID: string): Promise<void> {
+    const updatedItem = await this.prisma.$transaction(async (tx)=> {
+      const targetItem = await this.itemsRepository.getItemsbyId(itemID);
+      if (!targetItem){
+        throw new NotFoundException(`Item dengan ID ${itemID} tidak ditemukan.`);
+      }
+      
+      return await this.itemsRepository.deleteItem(itemID, tx)
+    })
   }
 }

@@ -4,6 +4,7 @@ export class Item {
   public readonly BillId: number;
   public readonly Name: string;
   public readonly Price: number;
+  CreatedBy: null;
 
   private constructor(props: {
     ItemId: string;

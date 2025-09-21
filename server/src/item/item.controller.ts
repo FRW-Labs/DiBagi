@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from "@nestjs/common";
+import { Controller, Delete, Get, Param, UseGuards } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { ItemService } from "./item.service";
 import { get } from "http";
@@ -23,5 +23,17 @@ export class ItemController {
     return {
         data : items,
     }
+   }
+
+   @Delete(':itemID/delete')
+   @UseGuards(JwtAuthGuard)
+   @ApiOperation({ summary: 'Delete item by ID' })
+   @ApiResponse({ status: 404, description: 'Item not found' })
+   @ApiResponse({ status: 200, description: 'Item deleted successfully' })
+   async deleteItem(@Param('itemID') itemID: string) {
+    await this.itemService.deleteItem(itemID);
+    return {
+        message: 'Item deleted successfully',
+    };
    }
 }
