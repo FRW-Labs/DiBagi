@@ -158,4 +158,32 @@ export class ItemRepository {
       where: { ItemID: itemId }
     })
   }
+
+  async updateItem(item: Item, tx?: Prisma.TransactionClient): Promise<Item> {
+    const prismaClient = tx ?? this.prisma;
+    // 1. defint to changed data
+    const dataToChange = {
+      Name : item.Name,
+      Price : item.Price,
+    }
+
+    // 2. update the item
+    const editedItem = await prismaClient.item.update({
+      where: { ItemID: item.ItemId },
+      data: dataToChange,
+      include: {
+        Bill: true
+      }
+    })
+
+    const billId = editedItem.Bill.BillID
+
+    return Item.from({
+      ItemId: editedItem.ItemID,
+      BillId: billId,
+      Name: editedItem.Name,
+      Price: editedItem.Price,
+      UserId: editedItem.UserID,
+    })
+  }
 }

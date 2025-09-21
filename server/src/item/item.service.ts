@@ -34,4 +34,27 @@ export class ItemService {
       return await this.itemsRepository.deleteItem(itemID, tx)
     })
   }
+
+  async updateItem(itemID : string, name: string, price: number): Promise<ItemResponse>{
+    // 1. start transaction
+    const updatedItem = await this.prisma.$transaction(async (tx)=> {
+      
+      // 2. check if item exists
+      const targetItem = await this.itemsRepository.getItemsbyId(itemID);
+      if (!targetItem){
+        throw new NotFoundException(`Item dengan ID ${itemID} tidak ditemukan.`);
+      }
+
+      // 3. update item entity
+      const entityItem = Item.from({
+        ItemId: itemID,
+        BillId: targetItem.BillId,
+        Name: name ?? targetItem.Name,
+        Price: price ?? targetItem.Price,
+        UserId: targetItem.UserId,
+      })
+    return await this.itemsRepository.updateItem(entityItem, tx);
+  });
+  return ItemResponse.convertToResponse(updatedItem);
+  }
 }
